@@ -1,4 +1,4 @@
-// JavaScript Document 2
+// JavaScript Document
 
 'use strict';
 
