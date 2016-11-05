@@ -1,4 +1,4 @@
-(function($){//Модули: 
+(function($){//РњРѕРґСѓР»Рё: 
 
 var defaultOptions = {
     nameIFrame: "",
@@ -19,12 +19,12 @@ var resizeIFrame = function($container, options) {
         
         $container.append('<div class="rif-show-dimensions panel panel-primary"><div class="panel-body"><span class="rif-width btn btn-default btn-lg">0</span> X <span class="rif-height btn btn-default btn-lg">0</span></div></div>');
         
-        //Свойства для навигатора
+        //РЎРІРѕР№СЃС‚РІР° РґР»СЏ РЅР°РІРёРіР°С‚РѕСЂР°
         ____._resize = false;
         ____._cursor_Y = 0;
         ____._cursor_X = 0;
         
-        //Установка обработчиков событий
+        //РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
         $iFrame.find('body').on('mousemove', ____._handlerMove);
         $('body').on('mousemove', ____._handlerMove);
         $('body').on('keydown', ____._handlerDown);
@@ -60,14 +60,14 @@ var resizeIFrame = function($container, options) {
         ____._create();
     }
     
-    //Нажатие на комбинацию клавиш
+    //РќР°Р¶Р°С‚РёРµ РЅР° РєРѕРјР±РёРЅР°С†РёСЋ РєР»Р°РІРёС€
     this._handlerDown = function(e)
     {
         if(e.which == 82 && e.ctrlKey && !e.shiftKey && !e.altKey)
         {
             if(!____._resize) {
                 $container.trigger( "rif.start.resize" );
-                //Фиксация в пикселах (чтоб меньше багов при расчётах было) и центрирование
+                //Р¤РёРєСЃР°С†РёСЏ РІ РїРёРєСЃРµР»Р°С… (С‡С‚РѕР± РјРµРЅСЊС€Рµ Р±Р°РіРѕРІ РїСЂРё СЂР°СЃС‡С‘С‚Р°С… Р±С‹Р»Рѕ) Рё С†РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ
                 var $rif = $container.find(" .rif-show-dimensions");
                 $rif
                 .attr("style", "")
@@ -99,7 +99,7 @@ var resizeIFrame = function($container, options) {
         }
     }
     
-    //Отпускание клавиш
+    //РћС‚РїСѓСЃРєР°РЅРёРµ РєР»Р°РІРёС€
     this._handlerUp = function(e)
     {
         if( ____._resize ) {
@@ -118,8 +118,8 @@ var resizeIFrame = function($container, options) {
         ____._reloadShowDimensions();
     }
     
-    //Центрирование iFrame при ресайзе если он меньше контейнера, а также если рамер iFrame больше чем размер контенера то правый край лепим к правому и нижний к нижнему чтобы небыло пустого пространства
-    //нужно для нормальной работы "map-navigator-iframe"
+    //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ iFrame РїСЂРё СЂРµСЃР°Р№Р·Рµ РµСЃР»Рё РѕРЅ РјРµРЅСЊС€Рµ РєРѕРЅС‚РµР№РЅРµСЂР°, Р° С‚Р°РєР¶Рµ РµСЃР»Рё СЂР°РјРµСЂ iFrame Р±РѕР»СЊС€Рµ С‡РµРј СЂР°Р·РјРµСЂ РєРѕРЅС‚РµРЅРµСЂР° С‚Рѕ РїСЂР°РІС‹Р№ РєСЂР°Р№ Р»РµРїРёРј Рє РїСЂР°РІРѕРјСѓ Рё РЅРёР¶РЅРёР№ Рє РЅРёР¶РЅРµРјСѓ С‡С‚РѕР±С‹ РЅРµР±С‹Р»Рѕ РїСѓСЃС‚РѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
+    //РЅСѓР¶РЅРѕ РґР»СЏ РЅРѕСЂРјР°Р»СЊРЅРѕР№ СЂР°Р±РѕС‚С‹ "map-navigator-iframe"
     this._centerIFrameAndNoEmptySpace = function()
     {
         var $iframe = $("#"+(____._options.nameIFrame));
@@ -155,7 +155,7 @@ var resizeIFrame = function($container, options) {
         }
     }
     
-    //Обновление показывателя текущих размеров
+    //РћР±РЅРѕРІР»РµРЅРёРµ РїРѕРєР°Р·С‹РІР°С‚РµР»СЏ С‚РµРєСѓС‰РёС… СЂР°Р·РјРµСЂРѕРІ
     this._reloadShowDimensions = function()
     {
         var $fittingWrap = $("#"+(____._options.nameIFrame)).closest(".pmv-fitting-wrap");
@@ -166,7 +166,7 @@ var resizeIFrame = function($container, options) {
         $container.find(" .rif-height").text( Math.round( h ) );
     }
     
-    //Обновление размеров IFrame
+    //РћР±РЅРѕРІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ IFrame
     this._handlerMove = function(e)
     {
         ____._last_cursor_X = e.screenX;

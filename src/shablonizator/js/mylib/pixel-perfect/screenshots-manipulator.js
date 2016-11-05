@@ -79,8 +79,10 @@ var screenshotsManipulator = function($container, options) {
     //Выбор разрешения
     this.handlerClickMedia = function(e){
         $container.find( " .sm-media" ).removeClass( "active" );
-        $(this).closest( ".sm-media" ).addClass( "active" );
-        $container.trigger("sm.change");
+        var $currentSMMedia = $(this).closest( ".sm-media" );
+        $currentSMMedia.addClass( "active" );
+        $container.trigger("sm.change");//и это тоже должно сработать после вызова "sm.change.size"//НЕСРАБОТАЛО
+        $container.trigger("sm.change.size", [parseInt($currentSMMedia.attr("data-width")), parseInt($currentSMMedia.attr("data-height"))]);
     }
     
     //Выбор скрина

@@ -55,12 +55,15 @@ var pixelPerfect = function($container, options) {
         
         screenshotsManipulator.$container.on("sm.change", function(){
             screenshotsManipulator._setSession( ____.$session, ____.$listAllScrins, ____.currentPage );
-            
+
             ____.reload();
-            
+
             ____._saveSession();
-            
+
             screenshotsManipulator.$container.trigger( "sm.change_post_set_session" );
+        });
+        screenshotsManipulator.$container.on("sm.change.size", function(e, w, h){
+            ____.setSizeIFrame( w, h );
         });
         screenshotsManipulator.$container.on("sm.changeoffsetstart", ____._refreshByChangePositionStart);
         screenshotsManipulator.$container.on("sm.changeoffset", ____._refreshByChangePosition);
@@ -128,6 +131,7 @@ var pixelPerfect = function($container, options) {
                     $page.find( " media[width][height]" ).attr( "active", "false" );
                     $media.attr( "active", "true" );
                     $container.trigger("pp.change.sizelist");
+                    ____.setSizeIFrame( w, h );
                 } else {
                     $page.find( " media[width][height]" ).attr( "active", "false" );
                     $media.attr( "active", "true" );
@@ -136,6 +140,11 @@ var pixelPerfect = function($container, options) {
             }
         }
     }
+
+        this.setSizeIFrame = function( w, h ) {
+            var $fittingWrap = $("#"+(____._options.nameIFrame)).closest(".pmv-fitting-wrap");
+            $fittingWrap.stop().animate({width: w+'px', height: h+'px'}, 1000);
+        }
     
     this.reload = function() {
         ____._deleteScrins();
