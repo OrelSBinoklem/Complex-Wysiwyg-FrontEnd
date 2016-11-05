@@ -1,5 +1,5 @@
 <wrap>
 	<pages>
 		
-	<page href="tests/questor-it.ru/www/case-hetto.html" active="true" scrolltop="0" scrollleft="0" l="343" t="0" w="720" h="480"/><page href="tests/questor-it.ru/www/case-piter-tyres.html" active="false" scrolltop="0" scrollleft="0" l="343" t="0" w="720" h="480"/></pages>
+	<page href="tests/questor-it.ru/www/case-hetto.html" active="true" scrolltop="0" scrollleft="0" l="543" t="0" w="320" h="500"/><page href="tests/questor-it.ru/www/case-piter-tyres.html" active="false" scrolltop="0" scrollleft="0" l="343" t="0" w="720" h="480"/></pages>
 </wrap>
