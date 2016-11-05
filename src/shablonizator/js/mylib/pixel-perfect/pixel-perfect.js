@@ -19,8 +19,7 @@ var pixelPerfect = function($container, options) {
     var screenshotsManipulator = new modules.screenshotsManipulator( ____._options.$screenshotsManipulatorContainer, this._options);
     ____.screenshotsManipulator = screenshotsManipulator;
     
-    this._create = function( href )
-    {
+    this._create = function( href ) {
         ____.setCurrentPage( href );
         
         $container.append('<div class="pp-design"></div>');

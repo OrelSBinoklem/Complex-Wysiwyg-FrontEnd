@@ -242,6 +242,11 @@ $(document).ready(function(){
     pageManagerVisualizator.$container.on( "pmv.load.iframe", function(){
         pixelPerfect._destroy();
         pixelPerfect._create( pageManagerVisualizator.lastLoadPage );
+
+        if( "$session" in pixelPerfect ) {
+            pixelPerfect.screenshotsManipulator.refresh( pixelPerfect.$session, pixelPerfect.$listAllScrins, pixelPerfect.currentPage );
+            handlerRefreshSelectSize();
+        }
     });
     
     //Добавляем разрешение

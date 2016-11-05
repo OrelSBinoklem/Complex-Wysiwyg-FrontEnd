@@ -5,4 +5,4 @@
 	
 	
 	
-<page xmlns="http://www.w3.org/1999/xhtml" href="tests/questor-it.ru/www/case-hetto.html"><media width="320" height="500" active="false"></media><media width="720" height="480" active="true"></media></page><page href="tests/questor-it.ru/www/case-piter-tyres.html"><media xmlns="http://www.w3.org/1999/xhtml" width="320" height="500" active="true"></media><media xmlns="http://www.w3.org/1999/xhtml" width="720" height="480" active="false"></media></page></wrap>
+<page xmlns="http://www.w3.org/1999/xhtml" href="tests/questor-it.ru/www/case-hetto.html"><media width="320" height="500" active="true"></media><media width="720" height="480" active="false"></media></page><page href="tests/questor-it.ru/www/case-piter-tyres.html"><media xmlns="http://www.w3.org/1999/xhtml" width="320" height="500" active="false"></media><media xmlns="http://www.w3.org/1999/xhtml" width="720" height="480" active="true"><scrin src="+design_account+++.png" active="false" deviation="static|center|top|0|0|0|0"></scrin></media></page></wrap>
