@@ -190,6 +190,7 @@ var pageManagerVisualizator = function($container, options) {
             case "pagelist":
                 for(var key in ____._options.pageList) {
                     if(____._options.pageList[key].active) {
+                        console.log("pagelist");
                         ____.selectPage(key);
                         break;
                     }

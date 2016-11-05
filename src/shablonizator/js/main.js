@@ -158,7 +158,7 @@ $(document).ready(function(){
     });
     
     //Сменяем страницу
-    $('.shab__top-menu').on('change', ' .select-page', function() {
+    $('.shab__top-menu').on('change', ' .select-page.selectpicker', function() {
         pageManagerVisualizator.selectPage( $('.shab__top-menu .select-page option:selected').first().attr('data-href') );
     });
     
