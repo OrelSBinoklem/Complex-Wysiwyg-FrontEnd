@@ -211,10 +211,11 @@ var screenshotsManipulator = function($container, options) {
         
         $container.find( " .sm-thumbnail-img-container" )
             .append( '<img src="'+ src +'" alt="" />' )
-        $container.find( " .sm-thumbnail" )
-            .css({width: ____._options.widthThumbnail})
+        var $thumbnail = $container.find( " .sm-thumbnail" );
+        $thumbnail
             .stop()
-            .fadeIn();
+            .fadeIn()
+            .css({width: ____._options.widthThumbnail, top: parseInt($thumbnail.css("top")) - ($thumbnail.offset().top)});
     }
     
     this._handlerHideThumbnail = function() {
