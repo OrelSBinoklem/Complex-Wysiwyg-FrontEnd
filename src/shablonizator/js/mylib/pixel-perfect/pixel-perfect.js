@@ -68,8 +68,7 @@ var pixelPerfect = function($container, options) {
         ____._restoreSession();
     }
     
-    this._destroy = function()
-    {
+    this._destroy = function() {
         clearInterval( ____.intervalRefreshByResizeDocument );
         ____._saveSession();
         $container.find( " .pp-design" ).remove();
@@ -123,29 +122,17 @@ var pixelPerfect = function($container, options) {
     this.selectSize = function( w, h ) {
         var $page = ____.$session.find( " page[href='" + ____.currentPage + "']" );
         if( $page.size() ) {
-            if( w != "none" ) {
-                var $media = $page.find( " media[width="+( w )+"][height="+( h )+"]" );
-                if( $media.size() ) {
-                    if( $media.attr( "active" ) != "true" ) {
-                        $page.find( " media[width][height]" ).attr( "active", "false" );
-                        $media.attr( "active", "true" );
-                        $container.trigger("pp.change.sizelist");
-                    } else {
-                        $page.find( " media[width][height]" ).attr( "active", "false" );
-                        $media.attr( "active", "true" );
-                    }
-                    ____.reload();
-                }
-            } else {
-                if( $media.size() ) {
-                    var changeSizelist = !!$page.find( " media[width][height][active='true']" ).size();
+            var $media = $page.find( " media[width="+( w )+"][height="+( h )+"]" );
+            if( $media.size() ) {
+                if( $media.attr( "active" ) != "true" ) {
                     $page.find( " media[width][height]" ).attr( "active", "false" );
                     $media.attr( "active", "true" );
-                    if( changeSizelist ) {
-                        $container.trigger("pp.change.sizelist");
-                    }
-                    ____.reload();
+                    $container.trigger("pp.change.sizelist");
+                } else {
+                    $page.find( " media[width][height]" ).attr( "active", "false" );
+                    $media.attr( "active", "true" );
                 }
+                ____.reload();
             }
         }
     }
