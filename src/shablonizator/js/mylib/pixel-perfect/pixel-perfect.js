@@ -316,15 +316,15 @@ var pixelPerfect = function($container, options) {
         //2 - показать дизайн
         switch ( show ) {
             case 0:
-                $("#pp_wrap_design").css({opacity: 0});
+                $container.find( " .pp-design" ).css({opacity: 0});
                 $( '#'+(____._options.nameIFrame) ).css({opacity: 1});
                 break;
             case 1:
-                $("#pp_wrap_design").css({opacity: 1});
+                $container.find( " .pp-design" ).css({opacity: 1});
                 $( '#'+(____._options.nameIFrame) ).css({opacity: 0.5});
                 break;
             case 2:
-                $("#pp_wrap_design").css({opacity: 1});
+                $container.find( " .pp-design" ).css({opacity: 1});
                 $( '#'+(____._options.nameIFrame) ).css({opacity: 0});
                 break;
         }
