@@ -1,1 +1,0 @@
-define("ace/snippets/matlab",["require","exports","module"],function(e,t,p){t.snippetText="",t.scope="matlab"});

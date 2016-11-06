@@ -1,1 +1,0 @@
-define("ace/snippets/jsoniq",["require","exports","module"],function(e,i,n){i.snippetText="",i.scope="jsoniq"});

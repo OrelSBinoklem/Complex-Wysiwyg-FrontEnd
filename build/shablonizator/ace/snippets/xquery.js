@@ -1,1 +1,0 @@
-define("ace/snippets/xquery",["require","exports","module"],function(e,p,i){p.snippetText="",p.scope="xquery"});

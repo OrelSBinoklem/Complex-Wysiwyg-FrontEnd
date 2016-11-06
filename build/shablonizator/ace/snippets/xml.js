@@ -1,1 +1,0 @@
-define("ace/snippets/xml",["require","exports","module"],function(e,p,i){p.snippetText="",p.scope="xml"});
