@@ -528,7 +528,7 @@ $(document).ready(function(){
                 HTML__dropdownMenu +=
                     '<div class="shab-ls__menu-style-files dropdown">';
                 HTML__dropdownMenu +=
-                        '<a role="button" data-toggle="dropdown" class="btn btn-block btn-default">' +
+                        '<a role="button" data-toggle="dropdown" class="btn btn-block btn-inverse">' +
                         '<span class="text">Ничего не выбрано</span> <span class="caret"></span>' +
                         '</a>';
                 HTML__dropdownMenu +=

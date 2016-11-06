@@ -134,7 +134,7 @@
                         <a href="#" class="gc__open-generator-btn btn btn-default"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Окно генератора кода (ввод данных и генерация кода)"><i class="fa fa-pencil-square-o"></i><span></span></a>
                     </div>
                 </div>
-                <button class="btn btn-default pmv__update-iframe-btn"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Обновить страницу вёрстки"><span class="glyphicon glyphicon-refresh"></span></span></button>
+                <button class="btn btn-danger pmv__update-iframe-btn"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Обновить страницу вёрстки"><span class="glyphicon glyphicon-refresh"></span></span></button>
             </div>
             <div class="shab-general-window__bottom">
                 <div class="pp__file-navigator"></div>
