@@ -1,0 +1,26 @@
+.gc__helpers {
+    position: absolute;
+    top: 0;
+    right: auto;
+    left: 0;
+    bottom: 0;
+    width: 480px;
+    margin-bottom: 0;
+}
+
+.twitter-bootstrap-3 .gc__helpers {/*убрать в будущем после удаления класса "twitter-bootstrap-3" из библиотеки бутстрапа*/
+    margin-bottom: 0;
+}
+
+.gc__helpers > .panel-body {
+    overflow: auto;
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.gc__helpers .mCSB_outside+.mCSB_scrollTools {
+    right: 0;
+}
