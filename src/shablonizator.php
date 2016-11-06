@@ -162,7 +162,7 @@
                 </div>
             </div>
         </div>
-        <div id="shab-right-column" class="ui-1-11-3">
+        <div class="shab-right-column ui-1-11-3">
             <div id="wrap_iframe" class="twitter-bootstrap-3">
 
             </div>
