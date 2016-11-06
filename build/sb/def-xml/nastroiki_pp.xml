@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wrap>
+	<screenshots_manipulator>opened</screenshots_manipulator>
+	<show_page_proofs_or_design>0</show_page_proofs_or_design>
+	<page href="chasi/glavnaya.html">
+		<media width="200" height="200" active="false" />
+		<media width="500" height="500" active="false" >
+			<scrin src="+design_account+++.png" active="true" deviation="fixed|left|top|0|0|0|0"/>
+			<scrin src="48_core_heroic.jpg" active="true" deviation="fixed|center|top|0|0|0|0"/>
+		</media>
+		<media width="1200" height="500" active="true" />
+	</page>
+	<page href="testGC/index.html">
+		<media width="960" height="480" active="false" >
+			<scrin src="design_basket_light.png" active="true" deviation="fixed|center|top|0|0|0|0"/>
+			<scrin src="+design_account+++.png" active="true" deviation="fixed|left|top|0|0|0|0"/>
+		</media>
+	</page>
+	<page href="lend/index.php">
+		<media width="320" height="500" active="false" >
+			<scrin src="+design_account+++.png" active="true" deviation="static|center|0|0|0|0"/>
+			<scrin src="+22design_account+++.png" active="true" deviation="static|center|0|0|0|0"/>
+		</media>
+	</page>
+	<page href="amb_buhuchet/index1.html">
+		
+	</page>
+</wrap>

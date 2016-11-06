@@ -1,0 +1,4 @@
+<wrap>
+<maineditor/>
+<twoeditor focus="true" twoeditor="true" orientation="beside"/>
+</wrap>
