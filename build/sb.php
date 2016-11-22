@@ -1,4 +1,4 @@
-<?php if(!isset($_POST['module']) && $_GET['pass'] == 32216554): ?>
+<?php /*$_GET['pass'] == 32216554*/ if(!isset($_POST['module'])): ?>
 <!DOCTYPE html>
     <head>
     <title>Шаблонизатор</title>

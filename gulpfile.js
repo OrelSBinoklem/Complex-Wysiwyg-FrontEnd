@@ -157,7 +157,12 @@ gulp.task('content', function () {
 });
 
 gulp.task('php', function () {
-    gulp.src("src/sb/**/*.{php,xml}")
+    gulp.src(["src/sb/**/*.{php,xml}", "!src/sb/*.xml"])
+        .pipe(gulp.dest("build/sb"));
+});
+
+gulp.task('def-xml', function () {
+    gulp.src("src/sb/def-xml/*.xml")
         .pipe(gulp.dest("build/sb"));
 });
 
@@ -227,6 +232,7 @@ gulp.task('build', [
     "js:ace",
     'content',
     'php',
+    'def-xml',
     'sb-generators',
     'sb-compiler',
 	'sb-scrins',
