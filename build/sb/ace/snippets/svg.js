@@ -1,1 +1,0 @@
-define("ace/snippets/svg",["require","exports","module"],function(e,s,p){s.snippetText="",s.scope="svg"});

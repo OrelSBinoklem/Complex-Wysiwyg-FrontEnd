@@ -1,1 +1,0 @@
-define("ace/snippets/mushcode",["require","exports","module"],function(e,s,o){s.snippetText="",s.scope="mushcode"});

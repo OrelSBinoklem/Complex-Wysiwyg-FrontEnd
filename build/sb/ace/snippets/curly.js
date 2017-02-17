@@ -1,1 +1,0 @@
-define("ace/snippets/curly",["require","exports","module"],function(e,p,c){p.snippetText="",p.scope="curly"});

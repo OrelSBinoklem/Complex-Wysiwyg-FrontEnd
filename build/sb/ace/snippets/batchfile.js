@@ -1,1 +1,0 @@
-define("ace/snippets/batchfile",["require","exports","module"],function(e,i,t){i.snippetText="",i.scope="batchfile"});

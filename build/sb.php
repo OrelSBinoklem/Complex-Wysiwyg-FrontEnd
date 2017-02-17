@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,400italic' rel='stylesheet' type='text/css'>
-    <script type="text/javascript" src="sb/ace/ace.js"></script>
 	<link rel="stylesheet" href="sb/all.min.css">
     <script type="text/javascript" src="sb/all.min.js"></script>
 </head>
@@ -73,9 +72,6 @@
             <div id="wrap_iframe" class="twitter-bootstrap-3">
 
             </div>
-            <div id="gc-helpers" class="twitter-bootstrap-3"></div>
-            <div id="gc-filemanager"></div>
-            <div id="gc-filemanager-insert-files"></div>
         </div>
     <div id="wrapper_canvas_zoom"><canvas id='example'>Обновите браузер</canvas><div id="pricel"></div></div>
     <!--Окно с глобальными настройками-->
@@ -175,13 +171,6 @@
             </div>
         </div>
     </div>
-    <style>
-        .ace-dreamweaver .ace_marker-layer .ace_bracket,
-        .ace_marker-layer .ace_bracket {
-            margin: -2px 0 0 -2px;
-            border-width: 2px;
-        }
-    </style>
     </body>
 </html>
 <?php endif; ?>
@@ -195,9 +184,6 @@ if(isset($_POST['module']))
             break;
         case "base_url_full":
             require_once("sb/php/base_url_full.php");
-            break;
-        case "copyist":
-            require_once("sb/php/copyist.php");
             break;
         case "filemanager":
             require_once("sb/php/filemanager.php");

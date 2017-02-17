@@ -9,8 +9,6 @@
 
         <!--jQuery, jQuery UI-->
         <link href="sb/css/ui-lightness/jquery-ui.css" rel="stylesheet">
-        <link href="sb/css/ui-lightness/jquery-ui.structure.css" rel="stylesheet">
-        <link href="sb/css/ui-lightness/jquery-ui.theme.css" rel="stylesheet">
 		<script type="text/javascript" src="sb/js/jquery-1.11.2.min.js"></script>
         <script src="sb/js/jquery-ui-1.11.3.min.js"></script>
 
@@ -22,27 +20,6 @@
         <script src="sb/js/bootstrap.min.js"></script>
         <script src="sb/js/selectpicker/bootstrap-select.min.js"></script>
         <script src="sb/js/selectpicker/i18n/defaults-ru_RU.js"></script>
-
-        <!--ACE-editor-->
-        <script src="sb/js/ace/ace.js"></script>
-        <script src="sb/js/ace/ext-emmet.js"></script>
-        <script src="sb/js/emmet.js"></script>
-        <script src="sb/js/ace/ext-modelist.js"></script>
-        <script src="sb/js/ace/ext-options.js"></script>
-        <script src="sb/js/ace/ext-elastic_tabstops_lite.js"></script>
-        <script src="sb/js/ace/ext-keybinding_menu.js"></script>
-        <script src="sb/js/ace/ext-language_tools.js"></script>
-        <script src="sb/js/ace/ext-searchbox.js"></script>
-        <script src="sb/js/ace/ext-settings_menu.js"></script>
-        <script src="sb/js/ace/ext-spellcheck.js"></script>
-        <script src="sb/js/ace/ext-split.js"></script>
-        <script src="sb/js/ace/ext-static_highlight.js"></script>
-        <script src="sb/js/ace/ext-statusbar.js"></script>
-        <script src="sb/js/ace/ext-textarea.js"></script>
-        <script src="sb/js/ace/ext-themelist.js"></script>
-        <script src="sb/js/ace/ext-whitespace.js"></script>
-        <script src="sb/js/ace/keybinding-emacs.js"></script>
-        <script src="sb/js/ace/keybinding-vim.js"></script>
         
         <script src="sb/js/jquery.zclip.js"></script>
 
@@ -78,26 +55,6 @@
         <script type="text/javascript" src="sb/js/mylib/pixel-perfect/screenshots-manipulator.js"></script>
         <link rel="stylesheet" href="sb/js/mylib/pixel-perfect/pixel-perfect.css">
         <script type="text/javascript" src="sb/js/mylib/pixel-perfect/pixel-perfect.js"></script>
-        
-        <!--editor-->
-        <link rel="stylesheet" href="sb/js/mylib/editor/editor.css">
-        <script type="text/javascript" src="sb/js/mylib/editor/editor.js"></script>
-
-        <!--live-style-->
-        <link rel="stylesheet" href="sb/js/mylib/live-style/live-style.css">
-        <script type="text/javascript" src="sb/js/mylib/live-style/live-style.js"></script>
-
-        <!--generator-code-->
-        <link rel="stylesheet" href="sb/js/mylib/generator-code/tabs-copy-insert.css">
-        <script type="text/javascript" src="sb/js/mylib/generator-code/tabs-copy-insert.js"></script>
-        <link rel="stylesheet" href="sb/js/mylib/generator-code/manager-fields.css">
-        <script type="text/javascript" src="sb/js/mylib/generator-code/manager-fields.js"></script>
-        <link rel="stylesheet" href="sb/js/mylib/generator-code/dynamic-blocks.css">
-        <script type="text/javascript" src="sb/js/mylib/generator-code/dynamic-blocks.js"></script>
-        <link rel="stylesheet" href="sb/js/mylib/generator-code/helpers.css">
-        <script type="text/javascript" src="sb/js/mylib/generator-code/helpers.js"></script>
-        <link rel="stylesheet" href="sb/js/mylib/generator-code/generator-code.css">
-        <script type="text/javascript" src="sb/js/mylib/generator-code/generator-code.js"></script>
         
         <link rel="stylesheet" href="sb/css/main.css">
         <script type="text/javascript" src="sb/js/main.js"></script>
@@ -166,9 +123,6 @@
             <div id="wrap_iframe" class="twitter-bootstrap-3">
 
             </div>
-            <div id="gc-helpers" class="twitter-bootstrap-3"></div>
-            <div id="gc-filemanager"></div>
-            <div id="gc-filemanager-insert-files"></div>
         </div>
     <div id="wrapper_canvas_zoom"><canvas id='example'>Обновите браузер</canvas><div id="pricel"></div></div>
     <!--Окно с глобальными настройками-->
@@ -268,13 +222,6 @@
             </div>
         </div>
     </div>
-    <style>
-        .ace-dreamweaver .ace_marker-layer .ace_bracket,
-        .ace_marker-layer .ace_bracket {
-            margin: -2px 0 0 -2px;
-            border-width: 2px;
-        }
-    </style>
     </body>
 </html>
 <?php endif; ?>
@@ -288,9 +235,6 @@ if(isset($_POST['module']))
             break;
         case "base_url_full":
             require_once("sb/php/base_url_full.php");
-            break;
-        case "copyist":
-            require_once("sb/php/copyist.php");
             break;
         case "filemanager":
             require_once("sb/php/filemanager.php");

@@ -1,1 +1,0 @@
-define("ace/snippets/pgsql",["require","exports","module"],function(e,p,s){p.snippetText="",p.scope="pgsql"});

@@ -1,1 +1,0 @@
-define("ace/snippets/verilog",["require","exports","module"],function(e,i,o){i.snippetText="",i.scope="verilog"});

@@ -27,7 +27,6 @@ gulp.task('sb.php', function () {
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\
     <meta charset=\"utf-8\">\n\
     <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,400italic' rel='stylesheet' type='text/css'>\n\
-    <script type=\"text/javascript\" src=\"sb/ace/ace.js\"></script>\n\
 	<link rel=\"stylesheet\" href=\"sb/all.min.css\">\n\
     <script type=\"text/javascript\" src=\"sb/all.min.js\"></script>\n\
 </head>";
@@ -51,9 +50,6 @@ gulp.task('style', function () {
         "src/sb/js/mylib/file-navigator/*.css",
         "src/sb/js/mylib/page-manager-visualizator/*.css",
         "src/sb/js/mylib/pixel-perfect/*.css",
-        "src/sb/js/mylib/editor/*.css",
-        "src/sb/js/mylib/live-style/*.css",
-        "src/sb/js/mylib/generator-code/*.css",
         "src/sb/css/main.css"
     ])
         .pipe(concatCss("all.min.css"))
@@ -83,40 +79,15 @@ gulp.task('js', function () {
             "src/sb/js/selectpicker/bootstrap-select.min.js",
             "src/sb/js/selectpicker/i18n/defaults-ru_RU.js",
 
-            "src/sb/js/ace/ext-emmet.js",
-            "src/sb/js/emmet.js",
-            "src/sb/js/ace/ext-modelist.js",
-            "src/sb/js/ace/ext-options.js",
-            "src/sb/js/ace/ext-elastic_tabstops_lite.js",
-            "src/sb/js/ace/ext-keybinding_menu.js",
-            "src/sb/js/ace/ext-language_tools.js",
-            "src/sb/js/ace/ext-searchbox.js",
-            "src/sb/js/ace/ext-settings_menu.js",
-            "src/sb/js/ace/ext-spellcheck.js",
-            "src/sb/js/ace/ext-split.js",
-            "src/sb/js/ace/ext-static_highlight.js",
-            "src/sb/js/ace/ext-statusbar.js",
-            "src/sb/js/ace/ext-textarea.js",
-            "src/sb/js/ace/ext-themelist.js",
-            "src/sb/js/ace/ext-whitespace.js",
-            "src/sb/js/ace/keybinding-emacs.js",
-            "src/sb/js/ace/keybinding-vim.js",
-
             "src/sb/js/jquery.zclip.js",
 
             "src/sb/js/malihu-custom-scrollbar/jquery.mCustomScrollbar.concat.min.js",
-
-            "src/sb/js/greensock/TimelineMax.min.js",
-            "src/sb/js/greensock/TweenMax.min.js",
 
             "src/sb/js/global.js",
 
             "src/sb/js/mylib/file-navigator/*.js",
             "src/sb/js/mylib/page-manager-visualizator/*.js",
             "src/sb/js/mylib/pixel-perfect/*.js",
-            "src/sb/js/mylib/editor/*.js",
-            "src/sb/js/mylib/live-style/*.js",
-            "src/sb/js/mylib/generator-code/*.js",
 
             "src/sb/js/main.js",
         ])
@@ -130,14 +101,6 @@ gulp.task('swf:for_zclip', function () {
             "src/sb/**/*.swf"
         ])
         .pipe(gulp.dest("build/sb/"));
-});
-
-gulp.task('js:ace', function () {
-    gulp.src([
-            "src/sb/js/ace/**/*.js"
-        ])
-        .pipe(uglify())
-        .pipe(gulp.dest("build/sb/ace"));
 });
 
 //content
@@ -166,16 +129,6 @@ gulp.task('def-xml', function () {
         .pipe(gulp.dest("build/sb"));
 });
 
-gulp.task('sb-generators', function () {
-    gulp.src("src/sb-generators/**/*.*")
-        .pipe(gulp.dest("build/sb-generators"));
-});
-
-gulp.task('sb-compiler', function () {
-    gulp.src("src/sb-compiler/**/*.*")
-        .pipe(gulp.dest("build/sb-compiler"));
-});
-
 gulp.task('sb-scrins', function () {
     gulp.src("src/sb-scrins/**/*.{jpg,png}")
         .pipe(gulp.dest("build/sb-scrins"));
@@ -195,8 +148,6 @@ mkdirp('build/sb/miniatyrki', function (err) {
     if (err) console.error(err)
     else console.log('pow!')
 });
-
-
 
 /*gulp.task('style:build', function () {
     gulp.src(path.src.style) //Выберем наш main.scss
@@ -229,12 +180,9 @@ gulp.task('build', [
     'style',
     "js",
     "swf:for_zclip",
-    "js:ace",
     'content',
     'php',
     'def-xml',
-    'sb-generators',
-    'sb-compiler',
 	'sb-scrins',
 	'miniatyrki'
 ]);

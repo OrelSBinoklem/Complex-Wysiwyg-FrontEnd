@@ -1,1 +1,0 @@
-define("ace/snippets/scheme",["require","exports","module"],function(e,s,p){s.snippetText="",s.scope="scheme"});
