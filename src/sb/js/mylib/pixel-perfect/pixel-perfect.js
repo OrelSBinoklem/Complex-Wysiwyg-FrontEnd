@@ -2,7 +2,7 @@
 
 var defaultOptions = {
     urlXML: "sb/pixel-perfect.xml",
-    dirScrins: "sb-scrins",
+    dirScrins: "design",
     dirThumbnail: "sb/miniatyrki",
     widthThumbnail: 240,
     nameIFrame: "PP_iframe",

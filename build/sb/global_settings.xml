@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><wrap>
-<text_encoding_server>Windows-1251</text_encoding_server>
-<rerouting_preprocessor_style>
-	<pattern>styles/</pattern>
-	<relative_folder>../sass</relative_folder>
-</rerouting_preprocessor_style>
-</wrap>
