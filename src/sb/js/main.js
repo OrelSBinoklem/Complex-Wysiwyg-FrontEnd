@@ -231,7 +231,7 @@ $(document).ready(function(){
     pixelPerfect = new modules.pixelPerfect($("#wrap_iframe .pmv-fitting-wrap"), {
         urlXML: "sb/pixel-perfect.xml",
         dirScrins: "design",
-        dirThumbnail: "sb/miniatyrki",
+        dirThumbnail: "sb/design-thumbnails",
         widthThumbnail: 240,
         nameIFrame: "PP_iframe",
         $screenshotsManipulatorContainer: $('.shab-general-window__bottom'),

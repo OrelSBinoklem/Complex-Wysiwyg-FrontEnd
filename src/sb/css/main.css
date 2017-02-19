@@ -48,14 +48,6 @@
     z-index: 1;
 }
 
-.twitter-bootstrap-3 .shab-ls__menu-ready-files {
-    margin: 2px -10px;
-}
-
-.twitter-bootstrap-3 .shab-ls__menu-ready-files .btn {
-    text-align: left;
-}
-
 #loading {
     position: fixed;
     left: 0;
@@ -287,231 +279,6 @@
 
 /*Для выподающего списка групп 'конец'*/
 
-/*Стилизер*/
-
-.twitter-bootstrap-3 .dropdown-menu > li.shab-ls__item-document > a,
-.twitter-bootstrap-3 .dropdown-menu > li.shab-ls__item-import > a {
-    font-weight: bold;
-}
-
-.shab-ls__menu-ready-files .dropdown-submenu>a:after {
-    border-left-color: #000;
-}
-
-.shab-ls__menu-ready-files .dropdown-submenu:hover>a:after {
-    border-left-color: #000;
-}
-
-.shab-ls__menu-ready-files .dropdown-submenu.active>a:after {
-    border-left-color: #fff;
-}
-
-.shab-ls__menu-ready-files .dropdown-submenu.active-children>a:after {
-    border-left-color: red;
-}
-
-.shab-ls__menu-ready-files .shab-ls__btn-file-document,
-.shab-ls__menu-ready-files .shab-ls__btn-file-ready-js {
-    margin: 2px 0 2px 5px;
-}
-
-/*Начало стилей для "генератора кода"*/
-
-.gc__select-generator {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 8;
-}
-
-.gc__select-generator > .panel {
-    height: 100%;
-    margin-bottom: 0;
-    position: relative;
-}
-
-.gc__select-generator > .panel > .panel-body {
-    overflow: auto;
-    position: absolute;
-    top: 42px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.gc__select-generator .gc__select-generator__type {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-}
-
-.gc__select-generator .gc__select-generator__collapse-uncollapse {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1;
-}
-
-.gc__select-generator--html-plus-css,
-.gc__select-generator--plugins {
-    padding-top: 50px;
-}
-
-.gc__select-generator li {
-    overflow: hidden;
-    position: relative;
-    padding-left: 20px;
-}
-
-.gc__select-generator a {
-    display: block;
-    font: 16px/18px Tahoma, sans-serif;
-    color: #000;
-    cursor: pointer;
-    height: 20px;
-    padding-left: 18px;
-}
-
-.gc__select-generator .f-close > ul {
-    display: none;
-}
-
-.gc__select-generator .f-visible > a,
-.gc__select-generator .f-open > a {
-    margin-bottom: 10px;/*cont.animate({height: hA + hUl + 10}, 1000);*/
-}
-
-.gc__select-generator .f-visible,
-.gc__select-generator .f-open {
-    padding-bottom: 10px;
-}
-
-.gc__select-generator .f-visible > ul > li:before,
-.gc__select-generator .f-open > ul > li:before {
-    content: '';
-    position: absolute;
-    left: 7px;
-    top: 9px;
-    width: 12px;
-    border-top: 1px dotted #000;
-}
-
-.gc__select-generator .f-open.hover > ul > li:before {
-    border-top-style: solid;
-}
-
-.gc__select-generator .f-visible:after,
-.gc__select-generator .f-open:after {
-    content: '';
-    position: absolute;
-    left: 27px;
-    top: 17px;
-    bottom: 20px;
-    border-left: 1px dotted #000;
-}
-
-.gc__select-generator .gc__select-generator-level-1.f-open:after {
-    display: none;
-}
-
-.gc__select-generator > .f-open:after {
-    left: 6px;
-}
-
-.gc__select-generator .f-open.hover:after {
-    border-left: 1px solid #000;
-}
-
-.gc__select-generator .disclosures {
-    position: absolute;
-    left: 0;
-    top: 2px;
-    z-index: 1;
-}
-
-.gc__select-generator .disclosures .fa {
-    height: 15px;
-    font-size: 18px;
-}
-
-.gc__select-generator .fa-square {
-    padding-left: 19px;
-}
-
-.gc__select-generator .fa-minus-square-o,
-.gc__select-generator .fa-plus-square-o {
-    background-color: #fff;
-    cursor: pointer;
-}
-
-.gc__select-generator .fa:before {
-    position: relative;
-    top: -1px;
-}
-
-.gc__select-generator .fa-minus-square-o:hover,
-.gc__select-generator .fa-plus-square-o:hover {
-    color: red;
-}
-
-.gc__select-generator .f-close > .disclosures .fa-minus-square-o,
-.gc__select-generator .f-close > .disclosures .fa-folder-open {
-    display: none;
-}
-
-.gc__select-generator .f-open > .disclosures .fa-plus-square-o,
-.gc__select-generator .f-open > .disclosures .fa-folder {
-    display: none;
-}
-
-.gc__select-generator .f-open > .disclosures .fa-folder-open {
-    color: #AF6000;
-}
-
-.gc__select-generator .f-close > .disclosures .fa-folder {
-    color: #FF8C00;
-}
-
-.gc__select-generator .mCSB_outside+.mCSB_scrollTools {
-    right: 0;
-    top: 5px;
-    bottom: 5px;
-}
-
-#gc-helpers {
-    display: none;
-    position: absolute;
-    top: 0;
-    right: auto;
-    left: 0;
-    bottom: 0;
-    width: 480px;
-}
-
-#gc-filemanager {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#gc-filemanager-insert-files {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/*Конец стилей для "генератора кода"*/
-
 .clear {
     clear: both;
 }
@@ -530,13 +297,6 @@
     z-index: 100000;
 }
 
-.ace_superline {
-    background-color: #999;
-    color: #f00;
-    position: absolute;
-    z-index: 2;
-}
-
 /*Файловый менеджер для редактора*/
 .pp__file-navigator {
     display: none;
@@ -547,14 +307,6 @@
     bottom: 0;
     z-index: 10;
     background-color: #fff;
-}
-
-.ui-selectable-helper {
-    z-index: 10000;
-}
-
-.ace_editor * {
-    box-sizing: content-box;
 }
 
 /*LESS*/

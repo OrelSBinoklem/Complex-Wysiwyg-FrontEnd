@@ -8,20 +8,18 @@
         <link rel="stylesheet" href="sb/css/reset.css">
 
         <!--jQuery, jQuery UI-->
-        <link href="sb/css/ui-lightness/jquery-ui.css" rel="stylesheet">
+        <link href="sb/js/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet">
 		<script type="text/javascript" src="sb/js/jquery-1.11.2.min.js"></script>
-        <script src="sb/js/jquery-ui-1.11.3.min.js"></script>
+        <script src="sb/js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
 
         <!--Bootstrap 3-->
-        <link href="sb/css/bootstrap.css" rel="stylesheet" media="screen">
-        <link href="sb/css/bootstrap-theme.css" rel="stylesheet" media="screen">
-        <link href="sb/css/font-awesome.min.css" rel="stylesheet" media="screen">
-        <link href="sb/js/selectpicker/bootstrap-select.min.css" rel="stylesheet" media="screen">
-        <script src="sb/js/bootstrap.min.js"></script>
+        <link href="sb/js/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+        <link href="sb/js/bootstrap-3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="sb/css/font-awesome.min.css" rel="stylesheet">
+        <link href="sb/js/selectpicker/bootstrap-select.min.css" rel="stylesheet">
+        <script src="sb/js/bootstrap-3.3.7/js/bootstrap.min.js"></script>
         <script src="sb/js/selectpicker/bootstrap-select.min.js"></script>
         <script src="sb/js/selectpicker/i18n/defaults-ru_RU.js"></script>
-        
-        <script src="sb/js/jquery.zclip.js"></script>
 
         <!--malihu-custom-scrollbar-->
         <link rel="stylesheet" href="sb/js/malihu-custom-scrollbar/jquery.mCustomScrollbar.min.css">
@@ -34,10 +32,6 @@
         <!--Начало моих модулей-->
         <script type="text/javascript" src="sb/js/global.js"></script>
         <!--<script type="text/javascript" src="sb/js/mylib/proverka-raboti-koda.js"></script>-->
-
-        <!--file-navigator-->
-        <link rel="stylesheet" href="sb/js/mylib/file-navigator/file-navigator.css">
-        <script type="text/javascript" src="sb/js/mylib/file-navigator/file-navigator.js"></script>
 
         <!--page-manager-visualizator-->
         <link rel="stylesheet" href="sb/js/mylib/page-manager-visualizator/custom-scrool-iframe.css">

@@ -3,7 +3,7 @@
 var defaultOptions = {
     urlXML: "sb/pixel-perfect.xml",
     dirScrins: "design",
-    dirThumbnail: "sb/miniatyrki",
+    dirThumbnail: "sb/design-thumbnails",
     widthThumbnail: 240,
     nameIFrame: "PP_iframe",
     $screenshotsManipulatorContainer: null,//Умолчания нету
