@@ -80,37 +80,11 @@
 
                 <div class="shab-global-settings-generator">
                     <button class="btn btn-default shab__global-settings-btn"><span class="glyphicon glyphicon-cog"></span></button>
-                    <div class="btn-group">
-                        <a href="#" class="gc__select-generator-btn btn btn-default"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Меню выбора генератора кода"><i class="fa fa-bars"></i></span></a>
-                        <a href="#" class="gc__open-generator-btn btn btn-default"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Окно генератора кода (ввод данных и генерация кода)"><i class="fa fa-pencil-square-o"></i><span></span></a>
-                    </div>
                 </div>
                 <button class="btn btn-danger pmv__update-iframe-btn"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Обновить страницу вёрстки"><span class="glyphicon glyphicon-refresh"></span></span></button>
             </div>
             <div class="shab-general-window__bottom">
                 <div class="pp__file-navigator"></div>
-                <div class="gc-wrap"></div>
-                <div class="gc__select-generator">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">Меню выбора модуля</div>
-                        <div class="gc__select-generator__panel-body panel-body">
-                            <div class="btn-group gc__select-generator__type">
-                                <button type="button" class="gc__select-generator-btn--html-plus-css btn btn-default active">html + css</button>
-                                <button type="button" class="gc__select-generator-btn--plugins btn btn-default">&nbsp;Плагины&nbsp;</button>
-                            </div>
-                            <div class="btn-group gc__select-generator__collapse-uncollapse">
-                                <button type="button" class="gc__select-generator__uncollapse btn btn-default"><i class="fa fa-expand"></i></button>
-                                <button type="button" class="gc__select-generator__collapse btn btn-default"><i class="fa fa-compress"></i></button>
-                            </div>
-                            <div class="gc__select-generator--html-plus-css f-open gc__select-generator-level-1">
-
-                            </div>
-                            <div class="gc__select-generator--plugins f-open gc__select-generator-level-1" style="display: none">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="shab-right-column">
@@ -118,7 +92,6 @@
 
             </div>
         </div>
-    <div id="wrapper_canvas_zoom"><canvas id='example'>Обновите браузер</canvas><div id="pricel"></div></div>
     <!--Окно с глобальными настройками-->
     <div class="shab__global-settings">
         <div class="panel panel-default">

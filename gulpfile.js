@@ -7,7 +7,7 @@ var gulp = require('gulp'),
     prefixer = require('gulp-autoprefixer'),
     uglify = require('gulp-uglify'),
     sass = require('gulp-sass'),
-    //sourcemaps = require('gulp-sourcemaps'),
+    sourcemaps = require('gulp-sourcemaps'),
     //rigger = require('gulp-rigger'),
     cssmin = require('gulp-minify-css'),
     //cleanCSS = require('gulp-clean-css'),
@@ -19,22 +19,28 @@ var gulp = require('gulp'),
 
 gulp.task('style', function () {
     gulp.src("src/sb/**/*.sass") //Выберем наш main.scss
+        .pipe(sourcemaps.init())
         .pipe(sass()) //Скомпилируем
         .pipe(prefixer()) //Добавим вендорные префиксы
         .pipe(cssmin()) //Сожмем
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest("build/sb"));
 });
 
 gulp.task('css', function () {
     gulp.src("src/sb/**/*.css") //Выберем наш main.scss
+        .pipe(sourcemaps.init())
         .pipe(prefixer()) //Добавим вендорные префиксы
         .pipe(cssmin()) //Сожмем
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest("build/sb"));
 });
 
 gulp.task('js', function () {
     gulp.src("src/sb/**/*.js") //Найдем наш main файл
+        .pipe(sourcemaps.init())
         .pipe(uglify()) //Сожмем наш js
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest("build/sb")); //Выплюнем готовый файл в build
 });
 
