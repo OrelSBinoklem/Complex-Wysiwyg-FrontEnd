@@ -4,14 +4,16 @@
     height: 100%
     overflow: hidden
     z-index: -1
-    .pp-screen-static, .pp-design .pp-screen-fixed
-        position: absolute
-        top: 0
-        left: 0
-        width: 100%
-        height: 100%
-        > div
+    .pp-screen
+        &-static,
+        &-fixed
+            position: absolute
+            top: 0
+            left: 0
             width: 100%
             height: 100%
-        *
-            position: relative
+            > div
+                width: 100%
+                height: 100%
+            *
+                position: relative

@@ -54,10 +54,10 @@
         <script type="text/javascript" src="sb/js/main.js"></script>
     </head>
     <body>
-        <div  id="testovaya_ssilka" class="twitter-bootstrap-3"><a href="#" class="btn btn-default" style="padding-left: 15px; position: fixed; left: 500px; top: 0; z-index: 100000;">Тест 1</a></div>
+        <div  id="testovaya_ssilka"><a href="#" class="btn btn-default" style="padding-left: 15px; position: fixed; left: 500px; top: 0; z-index: 100000;">Тест 1</a></div>
 
         <div class="shab-general-window">
-            <div class="shab-general-window__top twitter-bootstrap-3">
+            <div class="shab-general-window__top">
                 <div class="shab__top-menu">
                     <div class="pmv__select-page">
                         <select class="select-page selectpicker" data-width="389px"></select>
@@ -89,8 +89,8 @@
             </div>
             <div class="shab-general-window__bottom">
                 <div class="pp__file-navigator"></div>
-                <div class="gc-wrap twitter-bootstrap-3"></div>
-                <div class="gc__select-generator twitter-bootstrap-3">
+                <div class="gc-wrap"></div>
+                <div class="gc__select-generator">
                     <div class="panel panel-primary">
                         <div class="panel-heading">Меню выбора модуля</div>
                         <div class="gc__select-generator__panel-body panel-body">
@@ -113,14 +113,14 @@
                 </div>
             </div>
         </div>
-        <div class="shab-right-column ui-1-11-3">
-            <div id="wrap_iframe" class="twitter-bootstrap-3">
+        <div class="shab-right-column">
+            <div id="wrap_iframe">
 
             </div>
         </div>
     <div id="wrapper_canvas_zoom"><canvas id='example'>Обновите браузер</canvas><div id="pricel"></div></div>
     <!--Окно с глобальными настройками-->
-    <div class="shab__global-settings twitter-bootstrap-3">
+    <div class="shab__global-settings">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Настройки редактора</h3>
@@ -134,25 +134,11 @@
                     <option value="UTF-8">UTF-8</option>
                 </select>
                 <h4>Если sass, scss или less лежит в другой папке</h4>
-                <div class="row">
-                    <div class="col-xs-6">
-                        <label for="shab__global-settings-rerouting-pattern">Какие пути рероутить</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="shab__global-settings-rerouting-pattern" placeholder="Regular">
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <label for="shab__global-settings-rerouting-relative-folder">Куда рероутить</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="shab__global-settings-rerouting-relative-folder" placeholder="Relative url">
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
     <!--Модальное окно для добавления страниц в "менеджер страниц и визуализатор"-->
-    <div id="modal-pp-add-page-href" class="twitter-bootstrap-3">
+    <div id="modal-pp-add-page-href">
         <div class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -175,7 +161,7 @@
             </div>
         </div>
     </div>
-    <div id="modal-pp-add-group" class="twitter-bootstrap-3">
+    <div id="modal-pp-add-group">
         <div class="modal fade">
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">

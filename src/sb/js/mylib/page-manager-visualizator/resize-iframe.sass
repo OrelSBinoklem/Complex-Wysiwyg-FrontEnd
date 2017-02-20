@@ -1,18 +1,4 @@
-.rif-show-dimensions
-    display: none
-    position: absolute
-    opacity: 0.7
-    box-sizing: border-box
-
-.rif-show-dimensions.panel-primary
-    border-radius: 0
-
-.rif-show-dimensions .rif-width,
-.rif-show-dimensions .rif-height,
-.rif-show-dimensions .rif-width:hover,
-.rif-show-dimensions .rif-height:hover,
-.rif-show-dimensions .rif-width:active,
-.rif-show-dimensions .rif-height:active
+=rif-w-h()
     background: transparent
     border-radius: 0
     width: 75px
@@ -20,3 +6,16 @@
     box-shadow: none
     color: #000
     border-color: #adadad
+
+.rif-show-dimensions
+    display: none
+    position: absolute
+    opacity: 0.7
+    box-sizing: border-box
+    &.panel-primary
+        border-radius: 0
+    .rif
+        &-width, &-height
+            +rif-w-h()
+            &:hover, &:active
+                +rif-w-h()

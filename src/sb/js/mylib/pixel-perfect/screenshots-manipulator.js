@@ -16,7 +16,7 @@ var screenshotsManipulator = function($container, options) {
     this._create = function( href )
     {
         //HTML
-        $container.append('<div class="sm-container-scroll-wrap"><ul class="sm-container twitter-bootstrap-3"></ul></div>');
+        $container.append('<div class="sm-container-scroll-wrap"><ul class="sm-container"></ul></div>');
         $container.append('<div class="sm-thumbnail"><div class="sm-thumbnail-img-container"></div></div>');
         $container.find( " .sm-container-scroll-wrap" ).mCustomScrollbar({
             axis: "y",
