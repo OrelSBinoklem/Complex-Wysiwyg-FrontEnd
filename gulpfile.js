@@ -18,61 +18,46 @@ var gulp = require('gulp'),
 	mkdirp = require('mkdirp');
 
 gulp.task('style', function () {
-    gulp.src("src/sb/**/*.sass") //Выберем наш main.scss
+    gulp.src("src/public/**/*.sass") //Выберем наш main.scss
         .pipe(sourcemaps.init())
         .pipe(sass()) //Скомпилируем
         .pipe(prefixer()) //Добавим вендорные префиксы
         .pipe(cssmin()) //Сожмем
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest("build/sb"));
+        .pipe(gulp.dest("public"));
 });
 
 gulp.task('css', function () {
-    gulp.src("src/sb/**/*.css") //Выберем наш main.scss
-        .pipe(sourcemaps.init())
-        .pipe(prefixer()) //Добавим вендорные префиксы
+    gulp.src("src/public/**/*.css")
         .pipe(cssmin()) //Сожмем
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest("build/sb"));
+        .pipe(gulp.dest("public"));
 });
 
 gulp.task('js', function () {
-    gulp.src("src/sb/**/*.js") //Найдем наш main файл
+    gulp.src("src/public/**/*.js") //Найдем наш main файл
         .pipe(sourcemaps.init())
         .pipe(uglify()) //Сожмем наш js
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest("build/sb")); //Выплюнем готовый файл в build
+        .pipe(gulp.dest("public")); //Выплюнем готовый файл в build
 });
 
 //content
 gulp.task('content', function () {
-    gulp.src([
-            "src/sb/**/*.{jpg,png,gif,svg,otf,eot,svg,ttf,woff,woff2}"
-        ])
-        .pipe(gulp.dest("build/sb"));
+    gulp.src("src/public/**/*.{jpg,png,gif,svg,otf,eot,svg,ttf,woff,woff2}")
+        .pipe(gulp.dest("public"));
 });
 
-gulp.task('sb.php', function () {
-    gulp.src("src/sb.php")
-        .pipe(gulp.dest("build"));
+gulp.task('index.html', function () {
+    gulp.src("src/public/index.html")
+        .pipe(gulp.dest("public"));
 });
 
-gulp.task('php', function () {
-    gulp.src(["src/sb/**/*.{php,xml}", "!src/sb/*.xml"])
-        .pipe(gulp.dest("build/sb"));
+gulp.task('default-json', function () {
+    gulp.src("src/default-settings/**/*.json")
+        .pipe(gulp.dest("/"));
 });
 
-gulp.task('def-xml', function () {
-    gulp.src("src/sb/def-xml/*.xml")
-        .pipe(gulp.dest("build/sb"));
-});
-
-mkdirp('build/design', function (err) {
-    if (err) console.error(err)
-    else console.log('pow!')
-});
-
-mkdirp('build/sb/design-thumbnails', function (err) {
+mkdirp('public/design-thumbnails', function (err) {
     if (err) console.error(err)
     else console.log('pow!')
 });
@@ -99,13 +84,12 @@ gulp.task('js:build', function () {
 });*/
 
 gulp.task('build', [
-    'sb.php',
+    'index.html',
     'style',
     'css',
     "js",
     'content',
-    'php',
-    'def-xml'
+    'default-json'
 ]);
 
 gulp.task('default', ['build']);
