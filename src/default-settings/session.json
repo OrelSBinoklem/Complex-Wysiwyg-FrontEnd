@@ -1,6 +1,15 @@
 {
   "encoding": "Windows-1251",
+  "domain": "http://localhost:3010/"
   "pages": [],
+  "resolutions": [
+	{w: 1920, h: "auto"},
+	{w: 1280, h: "auto"},
+	{w: 992, h: "auto"},
+	{w: 768, h: "auto"}
+	{w: 480, h: "auto"}
+	{w: 320, h: "auto"}
+  ],
   "screenshots_manipulator": "hidden",
   "show_page_or_design": 0
 }
