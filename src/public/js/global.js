@@ -1,39 +1,7 @@
 var modules = {};
 
-var pageManagerVisualizator, pageManagerVisualizatorFileManager;
+var pageManagerVisualizator;
 var pixelPerfect;//Пиксель перфект
-
-//jQuery XML -> XML Text
-(function($){
-    $.fn.xml = function () {var r=[];this.each(function(){r.push($.xml(this))});return r };
-    $.xml = function(el) {
-        if (window.XMLSerializer)
-            return (new XMLSerializer()).serializeToString(el)
-        var qw = function(s){return '"' + s.replace(/"/g,'&quot;') + '"'};
-        if (!el) return "(null)";
-        var res = "";
-        var tag = el.nodeName.toLowerCase();
-        var tagShow = tag.charAt(0) != "#";
-        if (tagShow) res += '<' + tag;
-        if (el.attributes)
-            res += $.map(el.attributes,function(attr){
-                if (attr.specified && attr.name.charAt(0) != '$')
-                return ' '+attr.name /* .toLowerCase() */ + '=' + qw(attr.value)
-            }).join('');
-        if (tagShow && el.nodeValue == null && !el.hasChildNodes())
-        return res+" />";
-        if (tagShow)
-            res+= ">";
-        if (el.nodeType == 8)
-            res += "<!-- " + el.nodeValue + " -->";
-        else if (el.nodeValue != null)
-            res +=  el.nodeValue.toXML();
-        if (el.hasChildNodes && el.hasChildNodes())
-            res += $.map(el.childNodes,function(child){return $.xml(child)}).join('');
-        if (tagShow)  res += '</' + tag + '>';
-        return res
-    }
-})(jQuery);
 
 //Фикс работы find
 (function($){
@@ -53,10 +21,10 @@ var pixelPerfect;//Пиксель перфект
                 }
                 else
                 {
-                    console.log('$sresult:'+$result.size());
-                    console.log('d'+(this.find( " "+one__selector ).size()));
+                    //console.log('$sresult:'+$result.size());
+                    //console.log('d'+(this.find( " "+one__selector ).size()));
                     $result.add( this.find( " "+one__selector ) );
-                    console.log('$result:'+$result.size());
+                    //console.log('$result:'+$result.size());
                 }
             }
 
@@ -71,126 +39,8 @@ var pixelPerfect;//Пиксель перфект
 
 var shablonizator = {};//shablonizator
 
-/*===============================================*/
-/*Парсинг глобальных настроек и глобальной сессии*/
-/*===============================================*/
-(function($){
-    $.ajax({
-        url: "sb.php",
-        type: "POST",
-        cache: false,
-        data: ({module: 'getfile', dir: 'sb/global_settings.xml', text_encoding: 'UTF-8'}),
-        async: false,
-        success: function(data){
-            shablonizator.settings = $($.parseXML(data));
-        }
-    });
-    
-    $.ajax({
-        url: "sb.php",
-        type: "POST",
-        cache: false,
-        data: ({module: 'getfile', dir: 'sb/global_session.xml', text_encoding: 'UTF-8'}),
-        async: false,
-        success: function(data){
-            shablonizator.session = $($.parseXML(data));
-        }
-    });
-    
-    shablonizator.save_g_settings = function() {
-        $.ajax({
-            url: "sb.php",
-            async: true,
-            cache: false,
-            type: "POST",
-            data: ({module: 'setfile', dir: 'sb/global_settings.xml', file_text: shablonizator.settings.xml().join(''), text_encoding: 'UTF-8'}),
-            success: function(data){
-                
-            }
-        });
-    }
-    
-    shablonizator.save_g_session = function() {
-        $.ajax({
-            url: "sb.php",
-            async: true,
-            cache: false,
-            type: "POST",
-            data: ({module: 'setfile', dir: 'sb/global_session.xml', file_text: shablonizator.session.xml().join(''), text_encoding: 'UTF-8'}),
-            success: function(data){
-                
-            }
-        });
-    }
-    
-    shablonizator.textEncodingServer = shablonizator.settings.find('text_encoding_server').text();
-})(jQuery);
-
-shablonizator.base_url = '';
-$.ajax({
-      url: "sb.php",
-      type: "POST",
-      async: false,
-      cache: false,
-      data: ({module: 'base_url'}),
-      success: function(data){
-        shablonizator.base_url = data;
-    }
-});
-
-shablonizator.base_url_full = '';
-$.ajax({
-      url: "sb.php",
-      type: "POST",
-      async: false,
-      cache: false,
-      data: ({module: 'base_url_full'}),
-      success: function(data){
-        shablonizator.base_url_full = data;
-    }
-});
-
 shablonizator.base_url_page = '';
 shablonizator.base_url_page_full = '';
-
-shablonizator.updateBasesUrlPage = function( currentPage ) {
-    var result = '';
-
-    var re_host = /^(https?\:\/\/[\w\.\-]{0,70}\/)(.+)$/i;
-    var base_url_no_host = re_host.exec(shablonizator.base_url_full);
-    
-    var base_url_papki = new Array();
-    var url_page_kol_vozvratov = 0;
-    var url_page_papki = new Array();
-
-    var relativeCurrentPage = shablonizator.tolko_otnositelnii_put_v_rezultate("hack.html", currentPage);
-    if( relativeCurrentPage != "other_domain" ) {
-        base_url_papki = shablonizator.tolko_otnositelnii_put_v_rezultate.papki_array(base_url_no_host[2]);
-        url_page_kol_vozvratov = shablonizator.tolko_otnositelnii_put_v_rezultate.kol_vozvratov( relativeCurrentPage );
-        url_page_papki = shablonizator.tolko_otnositelnii_put_v_rezultate.papki_array( relativeCurrentPage );
-
-        if(base_url_papki.length >= url_page_kol_vozvratov)
-        {
-            base_url_papki.splice(base_url_papki.length - url_page_kol_vozvratov, url_page_kol_vozvratov);
-
-            for(var i = 0; i < base_url_papki.length; i++)
-            {
-                result += base_url_papki[i];
-            }
-            for(var i = 0; i < url_page_papki.length; i++)
-            {
-                result += url_page_papki[i];
-            }
-            shablonizator.base_url_page = "/" + result;
-            shablonizator.base_url_page_full = base_url_no_host[1] + result;
-        }
-        else {
-            throw new Error('Ошибка в sb.updateBasesUrlPage');
-        }
-    } else {
-        throw new Error('Страница находиться не на текущем домене');
-    }
-}
 
 //==============================================
 /* РАБОТА С URL*/
@@ -445,25 +295,6 @@ str.relativeUrlFrom2Absolute = function ( url__1, url__2, isFile__1, isFile__2 )
         throw new Error( "Один из url'ов не являеться абсолютным:" + url__1 + ":url 2:" + url__2 );
     }
 
-}
-
-//Проверка существования папки или файла
-shablonizator.fileExists = function(dir) {
-    var exists = false;
-    $.ajax({
-        url: "sb.php",
-        type: "POST",
-        cache: false,
-        data: ({module: 'file_exists', dir: dir, text_encoding: shablonizator.textEncodingServer}),
-        async: false,
-        success: function(data){
-            if(data == 'true')
-            {
-                exists = true;
-            }
-        }
-    });
-    return exists;
 }
 
 /***********************************************/

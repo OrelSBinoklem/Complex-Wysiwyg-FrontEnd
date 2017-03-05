@@ -1,3 +1,19 @@
+.shab__main-menu-container
+    position: fixed
+    top: 0
+    left: 0
+    bottom: 0
+    width: 120px
+    padding: 5px
+    box-sizing: border-box
+    z-index: 1
+    .btn
+        border: none
+        border-radius: 0
+        box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.5)
+    .form-control
+        border-radius: 0
+
 .shab__global-settings
     display: none
     position: fixed
@@ -7,15 +23,98 @@
     > .panel
         box-shadow: -1px 1px 5px rgba(0,0,0,0.3)
 
-.pmv__select-page
-    position: relative
-    z-index: 3
-    margin: 6px 5px
-    .select-page
-        .dropdown-toggle
-            padding-bottom: 1px
-        .filter-option .glyphicon-remove
-            top: -3px
+.pmv
+    &__select-page-open-list
+        margin-top: 50px
+        .caret
+            margin-left: 2px
+            border-left: 4px dashed
+            border-right: 0
+            border-top: 4px solid transparent
+            border-bottom: 4px solid transparent
+        &.active ~ .pmv__pages-window
+            display: block
+    &__pages
+        &-window
+            display: none
+            position: absolute
+            //+5 бордер правого контейнера
+            left: 125px
+            top: 0
+            bottom: 0
+            //+16 ширина скролла
+            width: 336px
+            box-shadow: 1px 0 5px 0 rgba(0,0,0,0.5)
+            background-color: #fff
+        &-top-menu
+            position: absolute
+            top: 0
+            left: 0
+            right: 0
+            height: 50px
+            padding: 5px
+            box-sizing: border-box
+        &-btn
+            &-collapsed.btn
+                display: none
+                position: absolute
+                top: 0
+                left: 0
+                box-shadow: none
+            //&-page
+            //&-group
+            &-drag.btn
+                display: none
+                position: absolute
+                top: 0
+                right: 0
+                box-shadow: none
+        &-item
+            margin-top: 5px
+            &-content
+                position: relative
+                &:hover > .pmv__pages-btn-drag
+                    display: block
+        &-sortable
+            padding: 5px
+            ul
+                width: 250px
+                ul
+                    margin-left: 30px
+            &-scrollwrap
+                position: absolute
+                top: 50px
+                left: 0
+                right: 0
+                bottom: 0
+                .mCSB_outside+.mCSB_scrollTools
+                    right: 0
+                    background-color: #fff
+            .placeholder
+                margin-top: 5px
+                outline: 1px dashed #4183C4
+            .btn
+                font-weight: bold
+                text-align: left
+                word-wrap: break-word
+                white-space: pre-wrap
+
+.have-nested
+    > * > .pmv__pages-btn
+        &-page, &-group
+            padding-left: 25px
+    > * > .pmv__pages-btn-collapsed
+        display: inline-block
+    &.collapsed
+        > * > .pmv__pages-btn-collapsed
+            .glyphicon-minus
+                display: none
+            .glyphicon-plus
+                display: inline-block
+
+.pmv__pages-btn-collapsed
+    .glyphicon-plus
+        display: none
 
 .pp__select-resolution
     position: relative
@@ -152,7 +251,7 @@
 .shab-right-column
     position: fixed
     top: 0
-    left: 480px
+    left: 120px
     right: 0
     bottom: 0
     overflow: hidden
@@ -376,3 +475,20 @@
 .btn-inverse .caret
     border-top-color: #fff
     border-bottom-color: #fff
+
+.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus
+    outline: none
+
+.btn-yellow
+    background-color: #ffff00
+
+.btn-yellow:hover,
+.btn-yellow:focus,
+.btn-yellow:active,
+.btn-yellow.active,
+.btn-yellow.disabled,
+.btn-yellow[disabled]
+    background-color: #ee0
+
+.btn-yellow.active.focus, .btn-yellow.active:focus, .btn-yellow.focus, .btn-yellow:active.focus, .btn-yellow:active:focus
+    background-color: #dd0

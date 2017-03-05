@@ -8,6 +8,7 @@ var gulp = require('gulp');
 
 var pageManagerVisualizator   = require('./lib/page-manager-visualizator');
 var pixelPerfect   = require('./lib/pixel-perfect');
+var sessionModel   = require('./lib/session-model.js');
 
 var ____;
 var __ = function(port, dirDesignScreenshots) {
@@ -17,6 +18,7 @@ var __ = function(port, dirDesignScreenshots) {
 
     this.pageManagerVisualizator = new pageManagerVisualizator();
     this.pixelPerfect = new pixelPerfect();
+    this.sessionModel = sessionModel.startSession(this.dirDesignScreenshots);
 
     this.app = express();
     this.server = http.createServer(this.app);
@@ -27,35 +29,9 @@ var __ = function(port, dirDesignScreenshots) {
 };
 
 __.start = function(port, dirDesignScreenshots) {
-    var _this = new __(port, dirDesignScreenshots);
-    ____ = _this;
-    _this.getSession().then(_this.init);
-    return _this;
-}
-
-__.prototype.getSession = function() {
-    var ____ = this;
-    return new Promise(function(resolve) {
-        if( !fs.existsSync( path.normalize(path.join(____.dirDesignScreenshots, '/session.json')) ) ) {
-            gulp.task("copy-session.json", function () {
-                return gulp.src( path.normalize(path.join(__dirname, 'src/default-settings/session.json')) )
-                    .pipe(gulp.dest(path.normalize(path.join(____.dirDesignScreenshots, '/'))))
-                    .on('end', next);
-            })
-                .start('copy-session.json');
-        } else {
-            next();
-        }
-        function next() {
-            fs.readFile( path.normalize(path.join(____.dirDesignScreenshots, '/session.json')), { encoding: 'utf8' }, function(error, session) {
-                if (!error) {
-                    ____.session = JSON.parse(session);
-                    console.log(____.session);
-                    resolve();
-                }
-            });
-        }
-    });
+    ____ = new __(port, dirDesignScreenshots);
+    ____.sessionModel.get().then(____.init);
+    return ____;
 }
 
 __.prototype.init = function() {
@@ -66,14 +42,35 @@ __.prototype.init = function() {
         ____.server.listen( ____.port || 3010 );
 
         ____.io.sockets.on('connection', function (socket) {
-            socket.emit('news', { hello: 'world' });
+            console.log("1");
+            socket.emit('session.load', ____.sessionModel.session);
+            console.log("2");
+            
+            socket.on('changepages', function (data) {
+                console.log(data);
+                ____.sessionModel.session.pages = data;
+                ____.sessionModel.sessionChange = true;
+            });
+
+            socket.on('disconnect', function () {
+                console.log('user disconnected');
+            });
+
+            /*socket.emit('news', { hello: 'world' });
             socket.on('my other event', function (data) {
                 console.log(data);
             });
             socket.on('disconnect', function () {
                 console.log('user disconnected');
-            });
+            });*/
         });
+
+        setInterval(function() {
+            if(____.sessionModel.sessionChange) {
+                ____.sessionModel.save();
+                ____.sessionModel.sessionChange = false;
+            }
+        }, 2000);
     }
 }
 

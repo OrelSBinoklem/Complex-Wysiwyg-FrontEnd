@@ -1,7 +1,7 @@
 (function($){//Модули: getfile, setfile, .xml(), customScrollIFrame
 
 var defaultOptions = {
-    urlXML: "sb/page-manager-visualizator.xml",
+    $mapNavigatorContainer: undefined,
     nameIFrame: "PP_iframe",
     pixelsScrollableInSeconds: 2000,
     minWOuterScroll: 23,
@@ -16,13 +16,13 @@ var defaultOptions = {
     verticalFixation: "top"
 };
 
-var pageManagerVisualizator = function($container, options) {
+var pageManagerVisualizator = function($container, sessionModel, options) {
     this._options = options;
     var ____ = this;
     ____.$container = $container;
     
     var customScrollIFrame = new modules.customScrollIFrame($container, this._options);
-    var mapNavigatorIFrame = new modules.mapNavigatorIFrame($container, this._options);
+    var mapNavigatorIFrame = new modules.mapNavigatorIFrame(options.$mapNavigatorContainer, this._options);
     var resizeIFrame = new modules.resizeIFrame($container, this._options);
     var fixationContentAtResize = new modules.fixationContentAtResize($container, this._options);
     
@@ -58,7 +58,7 @@ var pageManagerVisualizator = function($container, options) {
     }
     
     this._init = function() {
-        $container.append('<div class="pmv-outer-wrap"><div class="pmv-fitting-wrap"></div></div>');
+        /*$container.append('<div class="pmv-outer-wrap"><div class="pmv-fitting-wrap"></div></div>');
         $container.append('<div class="pmv-container-bl"></div><div class="pmv-container-bb"></div><div class="pmv-container-br"></div>');
         //Получем список страниц
         options.pageList = {};
@@ -69,7 +69,7 @@ var pageManagerVisualizator = function($container, options) {
             ____._restoreSession( "position_iframe" );
             
             resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
-        });
+        });*/
     }
     
     this.addPage = function(href) {
@@ -79,6 +79,7 @@ var pageManagerVisualizator = function($container, options) {
                 ____._options.pageList[key].active = false;
             }
             ____._options.pageList[href] = {active: true};
+            ____.currentPage = href;
             $container.trigger("pmv.change.pagelist");
             ____.selectPage(href);
         } else {
@@ -88,6 +89,7 @@ var pageManagerVisualizator = function($container, options) {
                     ____._options.pageList[key].active = false;
                 }
                 ____._options.pageList[href].active = true;
+                ____.currentPage = href;
                 $container.trigger("pmv.change.pagelist");
                 ____.selectPage(href);
             }
@@ -103,8 +105,10 @@ var pageManagerVisualizator = function($container, options) {
                 for( var key in ____._options.pageList ) {
                     ____._options.pageList[key].active = true;
                     firstPage = key;
+                    ____.currentPage = href;
                     break;
                 }
+
                 $container.trigger("pmv.change.pagelist");
                 ____._destroyIFrame();
             } else {
@@ -142,6 +146,7 @@ var pageManagerVisualizator = function($container, options) {
         }
         
         if( changePage ) {
+            ____.currentPage = href;
             $container.trigger("pmv.change.pagelist");
         }
         ____._destroyIFrame();
@@ -151,6 +156,7 @@ var pageManagerVisualizator = function($container, options) {
     this._createIFrame = function(href) {
         $container.trigger("pmv.prepaste.iframe");
         ____.lastLoadPage = href;
+        ____.currentPage = href;
         $container.find( ".pmv-fitting-wrap" ).append('<iframe id="'+(____._options.nameIFrame)+'" name="'+(____._options.nameIFrame)+'" src="'+href+'" width="100%" height="100%"></iframe>');
         $( '#'+(____._options.nameIFrame) ).load(function(){
             $container.trigger( "pmv.load.iframe" );
@@ -167,20 +173,9 @@ var pageManagerVisualizator = function($container, options) {
     
     this._restoreSession = function( specific ) {
         if( !("$session" in ____) ) {
-            $.ajax({
-                url: "sb.php",
-                type: "POST",
-                cache: false,
-                data: ({module: 'getfile', dir: ____._options.urlXML, text_encoding: 'UTF-8'}),
-                async: false,
-                success: function(data){
-                    ____.$session = $($.parseXML(data));
-                    ____.$session.find( "pages page" ).each(function(){
-                        ____._options.pageList[$(this).attr("href")] = {
-                            active: ($(this).attr("active") == "true") ? true : false
-                        }
-                    });
-                    $container.trigger("pmv.create.pagelist");
+            ____.$session.find( "pages page" ).each(function(){
+                ____._options.pageList[$(this).attr("href")] = {
+                    active: ($(this).attr("active") == "true") ? true : false
                 }
             });
         }
@@ -314,13 +309,6 @@ var pageManagerVisualizator = function($container, options) {
         resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
     }          
 }
-    
-    
-    
-    
-    
-    
-    
     
 /*jQuery.fn.responsiveBlock = function(options){
     options = $.extend({

@@ -15,10 +15,12 @@ var gulp = require('gulp'),
     //concat = require('gulp-concat'),
     //concatCss = require('gulp-concat-css'),
     //through2 = require('through2').obj,
+    changed = require('gulp-changed'),
 	mkdirp = require('mkdirp');
 
 gulp.task('style', function () {
     gulp.src("src/public/**/*.sass") //Выберем наш main.scss
+        .pipe(changed("public", {extension: '.css'}))
         .pipe(sourcemaps.init())
         .pipe(sass()) //Скомпилируем
         .pipe(prefixer()) //Добавим вендорные префиксы
@@ -29,32 +31,31 @@ gulp.task('style', function () {
 
 gulp.task('css', function () {
     gulp.src("src/public/**/*.css")
+        .pipe(changed("public"))
         .pipe(cssmin()) //Сожмем
         .pipe(gulp.dest("public"));
 });
 
 gulp.task('js', function () {
-    gulp.src("src/public/**/*.js") //Найдем наш main файл
+    gulp.src("src/public/**/*.js")
+        .pipe(changed("public"))
         .pipe(sourcemaps.init())
         .pipe(uglify()) //Сожмем наш js
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest("public")); //Выплюнем готовый файл в build
+        .pipe(gulp.dest("public"));
 });
 
 //content
 gulp.task('content', function () {
     gulp.src("src/public/**/*.{jpg,png,gif,svg,otf,eot,svg,ttf,woff,woff2}")
+        .pipe(changed("public"))
         .pipe(gulp.dest("public"));
 });
 
 gulp.task('index.html', function () {
     gulp.src("src/public/index.html")
+        .pipe(changed("public"))
         .pipe(gulp.dest("public"));
-});
-
-gulp.task('default-json', function () {
-    gulp.src("src/default-settings/**/*.json")
-        .pipe(gulp.dest("/"));
 });
 
 mkdirp('public/design-thumbnails', function (err) {
@@ -88,8 +89,13 @@ gulp.task('build', [
     'style',
     'css',
     "js",
-    'content',
-    'default-json'
+    'content'
 ]);
 
 gulp.task('default', ['build']);
+
+gulp.watch("src/public/index.html", ['index.html']);
+gulp.watch("src/public/**/*.sass", ['style']);
+gulp.watch("src/public/**/*.css", ['css']);
+gulp.watch("src/public/**/*.js", ['js']);
+gulp.watch("src/public/**/*.{jpg,png,gif,svg,otf,eot,svg,ttf,woff,woff2}", ['content']);
