@@ -121,7 +121,11 @@ jQuery(function($) {
                 },
                 callbacks: {
                     onUpdate: function() {
-                        console.log("onUpdate");
+                        if($(".pmv__pages-sortable-scrollwrap").hasClass("_mCS_1 mCS_no_scrollbar")) {
+                            $(".pmv__pages-window").addClass("no-scrollbar");
+                        } else {
+                            $(".pmv__pages-window").removeClass("no-scrollbar");
+                        }
                     }
                 }
             });
