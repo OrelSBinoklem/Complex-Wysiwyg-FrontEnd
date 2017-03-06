@@ -69,11 +69,13 @@
         <div class="pmv__pages-window">
             <div class="pmv__pages-top-menu">
                 <div class="form-inline">
-                    <div class="form-group">
-                        <input type="text" class="form-control input-sm pmv__pages-domain" placeholder="Домен">
+                    <div class="pmv__pages-domain">
+                        <input type="text" class="form-control input-sm pmv__pages-domain-input" placeholder="Домен">
+                        <div class="pmv__add-page-group">
+                            <button class="pmv__add-page btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Добавить страницу"><span class="fa fa-plus-circle"></span></button>
+                            <button class="pmv__add-group btn btn-default btn-sm btn-yellow" data-toggle="tooltip" data-placement="bottom" title="Добавить группу"><span class="fa fa-plus-circle"></span></button>
+                        </div>
                     </div>
-                    <button class="pmv__add-page btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Добавить страницу"><span class="fa fa-plus-circle"></span></button>
-                    <button class="pmv__add-group btn btn-default btn-sm btn-yellow" data-toggle="tooltip" data-placement="bottom" title="Добавить группу"><span class="fa fa-plus-circle"></span></button>
                 </div>
             </div>
             <div class="pmv__pages-sortable-scrollwrap">
@@ -129,7 +131,7 @@
     </div>
 </div>
 <!--Модальное окно для добавления страниц в "менеджер страниц и визуализатор"-->
-<div id="modal-pp-add-page-href">
+<div id="modal-pmv-add-page-href">
     <div class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">

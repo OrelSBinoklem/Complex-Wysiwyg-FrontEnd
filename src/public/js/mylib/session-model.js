@@ -3,10 +3,33 @@
         var ____ = this;
         ____.data = data;
 
-        this.save = function() {
-            socket.emit('changepages', ____.data.pages);
+        /*********************************/
+        /*Общая синхронизация*/
+        /*********************************/
+
+        /*Синхронизации сессий*/
+        /*Страницы*/
+        this.savePages = function() {
+            socket.emit('modified_pages', ____.data.pages);
             console.log(____.data.pages);
         }
+        /*Разрешения экрана*/
+        /*Скриншоты*/
+
+        /*********************************/
+        /*Синхронизация по группам сессий*/
+        /*********************************/
+        this.getSessionFromGroups = function(groups) {
+            if(groups.length) {
+
+            } else {
+                //Берём сессию для текущего браузера из куков
+
+            }
+        }
+        /*Страницы*/
+        /*Разрешения экрана*/
+        /*Айфрейм с вёрсткой*/
 
         this.getPage = function(urn) {
             return (function recursion(el) {

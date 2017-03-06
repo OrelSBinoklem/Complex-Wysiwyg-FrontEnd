@@ -58,7 +58,12 @@
             box-sizing: border-box
             border-bottom: 1px dashed #999
         &-domain
-
+            position: absolute
+            left: 5px
+            top: 5px
+            right: 75px
+            &-input.form-control
+                width: 100%
         &-btn
             &-collapsed.btn
                 display: none
@@ -66,8 +71,11 @@
                 top: 0
                 left: 0
                 box-shadow: none
-            //&-page
-            //&-group
+            &-page-group
+                position: absolute
+                top: 0
+                left: 100%
+                padding-left: 5px
             &-drag.btn
                 display: none
                 position: absolute
@@ -103,6 +111,12 @@
                 text-align: left
                 word-wrap: break-word
                 white-space: pre-wrap
+    &__add-page-group
+        position: absolute
+        top: 0
+        left: 100%
+        width: 71px
+        padding-left: 5px
 
 .have-nested
     > * > .pmv__pages-btn

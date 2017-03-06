@@ -137,10 +137,9 @@ jQuery(function($) {
                     $(this).removeClass('active');
                 }
             });
-
             var dragItemList = false;
-            $( "body" ).on("click click.body.iframe", function (e) {
-                if( $(e.target).closest($(".pmv__select-page-open-list").add($(".pmv__pages-window"))).length == 0 && !dragItemList ) {
+            $("body").on("click click.body.iframe", function (e) {
+                if( $(e.target).closest($(".pmv__select-page-open-list").add($(".pmv__pages-window")).add($("#modal-pmv-add-page-href"))).length == 0 && !dragItemList ) {
                     if( $(".pmv__select-page-open-list").hasClass('active') ) {
                         $(".pmv__select-page-open-list").removeClass('active');
                     }
@@ -148,24 +147,26 @@ jQuery(function($) {
             });
 
             //Добавляем страницу
-            //Добавить страницу после клика
-            $('#modal-pp-add-page-href .btn-select').on('click', function(event){
-                handlerAddPage( $('#modal-pp-add-page-href .pmv-href').val() );
-                $('#modal-pp-add-page-href .modal').modal('hide');
+            $('#modal-pmv-add-page-href .btn-select').on('click', function(event){
+                handlerAddPage( $('#modal-pmv-add-page-href .pmv-href').val() );
+                $('#modal-pmv-add-page-href .modal').modal('hide');
             });
             $('.pmv__add-page').on('click', function(){
-                $('#modal-pp-add-page-href .pmv-href').val( window[pageManagerVisualizator._options.nameIFrame].window.location.href );
-                $('#modal-pp-add-page-href .modal').modal('show');
+                if(pageManagerVisualizator._options.nameIFrame in window) {
+                    //отделить домен от urn
+                    $('#modal-pmv-add-page-href .pmv-href').val( window[pageManagerVisualizator._options.nameIFrame].window.location.href );
+                }
+                $('#modal-pmv-add-page-href .modal').modal('show');
             });
-            //Выделение
-            $('#modal-pp-add-page-href').on('shown.bs.modal', function(e){
-                var input = $('#modal-pp-add-page-href .pmv-href');
+            $('#modal-pmv-add-page-href').on('shown.bs.modal', function(e){
+                var input = $('#modal-pmv-add-page-href .pmv-href');
+                //Выделение
                 input.get(0).focus();
-                input.get(0).setSelectionRange(0, input.val().length);
+                //input.get(0).setSelectionRange(0, input.val().length);
             });
-
-            function handlerAddPage(href){
-                pageManagerVisualizator.addPage( href );
+            function handlerAddPage(urn){
+                //pageManagerVisualizator.addPage( href );
+                console.log(urn);
             }
 
             //Удаляем страницу
@@ -247,9 +248,8 @@ jQuery(function($) {
                         clearEmptyUl($main);
                         refreshNestedEl($main);
                         clearCollapseNotNested($main);
-                        socket.emit("changepages", {gg: 3});
                         session.data.pages = pagesNestedToJson($main);
-                        session.save();
+                        session.savePages();
                     }
                 });
                 refreshNestedEl($main);

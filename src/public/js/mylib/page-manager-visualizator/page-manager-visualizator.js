@@ -58,7 +58,7 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     }
     
     this._init = function() {
-        /*$container.append('<div class="pmv-outer-wrap"><div class="pmv-fitting-wrap"></div></div>');
+        $container.append('<div class="pmv-outer-wrap"><div class="pmv-fitting-wrap"></div></div>');
         $container.append('<div class="pmv-container-bl"></div><div class="pmv-container-bb"></div><div class="pmv-container-br"></div>');
         //Получем список страниц
         options.pageList = {};
@@ -69,86 +69,11 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
             ____._restoreSession( "position_iframe" );
             
             resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
-        });*/
-    }
-    
-    this.addPage = function(href) {
-        if( !(href in ____._options.pageList) ) {
-            //Если такой страницы нету
-            for( var key in ____._options.pageList ) {
-                ____._options.pageList[key].active = false;
-            }
-            ____._options.pageList[href] = {active: true};
-            ____.currentPage = href;
-            $container.trigger("pmv.change.pagelist");
-            ____.selectPage(href);
-        } else {
-            if( !(____._options.pageList[href].active) ) {
-                //Если страница есть но она неактивна - делаем её активной
-                for( var key in ____._options.pageList ) {
-                    ____._options.pageList[key].active = false;
-                }
-                ____._options.pageList[href].active = true;
-                ____.currentPage = href;
-                $container.trigger("pmv.change.pagelist");
-                ____.selectPage(href);
-            }
-        }
-    }
-    
-    this.removePage = function(href) {
-        var firstPage = false;
-        if( href in ____._options.pageList ) {
-            if(____._options.pageList[href].active) {
-                //Если страница активна то удаляем её и переводим фокус в первую страницу (если она есть)
-                delete ____._options.pageList[href];
-                for( var key in ____._options.pageList ) {
-                    ____._options.pageList[key].active = true;
-                    firstPage = key;
-                    ____.currentPage = href;
-                    break;
-                }
-
-                $container.trigger("pmv.change.pagelist");
-                ____._destroyIFrame();
-            } else {
-                //Если неактивна удаляем
-                delete ____._options.pageList[href];
-                $container.trigger("pmv.change.pagelist");
-                ____._saveSession();
-            }
-            
-            if(firstPage !== false) {____._createIFrame(firstPage)};
-        }
-    }
-    
-    this.reloadPage = function() {
-        for(var key in ____._options.pageList) {
-            if(____._options.pageList[key].active) {
-                ____.selectPage(key);
-                break;
-            }
-        }
+        });
     }
     
     this.selectPage = function(href) {
-        var changePage = false;
-        
-        for(var key in ____._options.pageList) {
-            if( href == key ) {
-                if( ____._options.pageList[key].active === false) {
-                    changePage = true;
-                }
-                ____._options.pageList[key].active = true;
-            } else {
-                ____._options.pageList[key].active = false;
-            }
-        }
-        
-        if( changePage ) {
-            ____.currentPage = href;
-            $container.trigger("pmv.change.pagelist");
-        }
+        ____.currentPage = href;
         ____._destroyIFrame();
         ____._createIFrame(href);
     }
@@ -158,10 +83,10 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
         ____.lastLoadPage = href;
         ____.currentPage = href;
         $container.find( ".pmv-fitting-wrap" ).append('<iframe id="'+(____._options.nameIFrame)+'" name="'+(____._options.nameIFrame)+'" src="'+href+'" width="100%" height="100%"></iframe>');
-        $( '#'+(____._options.nameIFrame) ).load(function(){
-            $container.trigger( "pmv.load.iframe" );
-            $( '#'+(____._options.nameIFrame) ).contents().find('body').on('click', function(e){
-                $( "body" ).trigger( "click.body.iframe" );
+        $('#'+(____._options.nameIFrame)).load(function(){
+            $container.trigger( "pmv.load.iframe");
+            $('#'+(____._options.nameIFrame)).contents().find('body').on('click', function(e){
+                $("body").trigger( "click.body.iframe" );
             });
         });
     }

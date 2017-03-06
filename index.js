@@ -42,12 +42,10 @@ __.prototype.init = function() {
         ____.server.listen( ____.port || 3010 );
 
         ____.io.sockets.on('connection', function (socket) {
-            console.log("1");
             socket.emit('session.load', ____.sessionModel.session);
-            console.log("2");
             
-            socket.on('changepages', function (data) {
-                console.log(data);
+            socket.on('modified_pages', function (data) {
+                //console.log(data);
                 ____.sessionModel.session.pages = data;
                 ____.sessionModel.sessionChange = true;
             });
