@@ -30,9 +30,11 @@
     <link rel="stylesheet" href="js/malihu-custom-scrollbar/jquery.mCustomScrollbar.min.css">
     <script type="text/javascript" src="js/malihu-custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
 
-    <!--GreenSock (крутые анимашки)-->
-    <script type="text/javascript" src="js/greensock/TimelineMax.min.js"></script>
-    <script type="text/javascript" src="js/greensock/TweenMax.min.js"></script>
+    <!--jquery-cookie-->
+    <script type="text/javascript" src="js/jquery-cookie/jquery.cookie.js"></script>
+
+    <!--jquery-json-->
+    <script type="text/javascript" src="js/jquery-json/jquery.json.min.js"></script>
 
     <!--Начало моих модулей-->
     <script type="text/javascript" src="js/global.js"></script>
@@ -65,12 +67,12 @@
     <div  id="testovaya_ssilka"><a href="#" class="btn btn-default" style="padding-left: 15px; position: fixed; left: 500px; top: 0; z-index: 100000;">Тест 1</a></div>
 
     <div class="shab__main-menu-container">
+        <div class="mnif__navigator-window"></div>
         <button class="pmv__select-page-open-list btn btn-default btn-block">Страницы <span class="caret"></span></button>
         <div class="pmv__pages-window">
             <div class="pmv__pages-top-menu">
                 <div class="form-inline">
                     <div class="pmv__pages-domain">
-                        <input type="text" class="form-control input-sm pmv__pages-domain-input" placeholder="Домен">
                         <div class="pmv__add-page-group">
                             <button class="pmv__add-page btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Добавить страницу"><span class="fa fa-plus-circle"></span></button>
                             <button class="pmv__add-group btn btn-default btn-sm btn-yellow" data-toggle="tooltip" data-placement="bottom" title="Добавить группу"><span class="fa fa-plus-circle"></span></button>
@@ -78,11 +80,11 @@
                     </div>
                 </div>
             </div>
-            <div class="pmv__pages-sortable-scrollwrap">
-                <div class="pmv__pages-sortable">
-
-                </div>
-            </div>
+            <div class="pmv__pages-sortable-scrollwrap"><div class="pmv__pages-sortable"></div></div>
+        </div>
+        <div class="shab__main-menu-bottom-section">
+            <div class="shab__session-groups-list open"></div>
+            <button class="pmv__btn-open-groups-session btn btn-default btn-block">Сессии <span class="caret"></span></button>
         </div>
     </div>
 

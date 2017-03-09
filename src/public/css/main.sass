@@ -14,6 +14,60 @@
     .form-control
         border-radius: 0
 
+.shab__main-menu-bottom-section
+    position: absolute
+    left: 0
+    bottom: 0
+    right: 0
+    padding: 5px
+
+.pmv__btn-open-groups-session
+    .caret
+        border-top: 0
+        border-bottom: 4px dashed
+
+.shab__session-groups-list
+    margin-bottom: 5px
+    border-bottom: 1px dashed #999
+
+.shab__session-groups-list-item
+    position: relative
+    ~ .shab__session-groups-list-item
+        margin-top: 5px
+
+.shab__session-groups-list.open
+    .shab__session-groups-list-item
+        height: 40px
+
+.shab__session-groups-btn-drag
+    display: none
+
+.shab__session-groups-list.open .shab__session-groups-list-item:hover .shab__session-groups-btn-drag
+    display: inline-block
+    position: absolute
+    top: 0
+    right: 0
+    box-shadow: none
+
+.shab__session-groups-list .ui-sortable-placeholder
+    visibility: visible!important
+    margin-top: 5px
+    outline: #4183C4 dashed 1px
+
+.shab__session-groups-synchro-params-btn
+    position: absolute
+    left: 0
+    top: 20px
+    box-shadow: none
+    width: 22px
+    height: 20px
+    &.active
+        box-shadow: inset 0 -2px 0 0 #000
+    &[data-param="resolutions"]
+        left: 22px
+    &[data-param="iframe"]
+        left: 44px
+
 .shab__global-settings
     display: none
     position: fixed
@@ -111,6 +165,8 @@
                 text-align: left
                 word-wrap: break-word
                 white-space: pre-wrap
+                &.active
+                    box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.5), inset 0 -2px 0 0 #000
     &__add-page-group
         position: absolute
         top: 0
@@ -155,6 +211,10 @@
     right: 5px
     z-index: 1
 
+.mnif
+    &__navigator-window
+        height: 110px
+
 #loading
     position: fixed
     left: 0
@@ -162,7 +222,7 @@
     width: 0
     height: 0
     z-index: 1002
-    display: table
+    display: table!important
     table-layout: fixed
     background-color: rgba(0,0,0,0.7)
     overflow: hidden
@@ -170,6 +230,8 @@
     -moz-transition: opacity .5s ease-in-out
     -webkit-transition: opacity .5s ease-in-out
     transition: opacity .5s ease-in-out
+    &, *
+        box-sizing: content-box
     &.show
       opacity: 1
     .wrap
@@ -360,17 +422,6 @@
     background-color: white
     overflow: auto
     z-index: 100000
-
-/*Файловый менеджер для редактора*/
-.pp__file-navigator
-    display: none
-    position: absolute
-    top: 0
-    left: 0
-    right: 0
-    bottom: 0
-    z-index: 10
-    background-color: #fff
 
 /*LESS*/
 /*Класс "fa" - дополнительные иконки*/

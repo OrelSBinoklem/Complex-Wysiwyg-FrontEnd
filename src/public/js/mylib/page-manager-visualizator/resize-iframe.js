@@ -153,6 +153,8 @@ var resizeIFrame = function($container, options) {
         } else {
             $fittingWrap.css({top: 0});
         }
+
+        $container.trigger("rif.center-iframe");
     }
     
     //Обновление показывателя текущих размеров

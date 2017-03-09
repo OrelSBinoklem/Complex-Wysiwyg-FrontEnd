@@ -10,7 +10,8 @@ var defaultOptions = {
     minHDraggable: 15,
     minWIFrame: 320,
     minHIFrame: 480,
-    responsiveToMovementOfTheCursorInAConfinedSpace: false,
+    responsiveToMovementOfTheCursorInAConfinedSpace: true,
+    movementOfTheCursorInAConfinedSpaceSpred: 10,
     
     gorizontalFixation: "center",
     verticalFixation: "top"
@@ -22,7 +23,7 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     ____.$container = $container;
     
     var customScrollIFrame = new modules.customScrollIFrame($container, this._options);
-    var mapNavigatorIFrame = new modules.mapNavigatorIFrame(options.$mapNavigatorContainer, this._options);
+    var mapNavigatorIFrame = new modules.mapNavigatorIFrame($container, this._options);
     var resizeIFrame = new modules.resizeIFrame($container, this._options);
     var fixationContentAtResize = new modules.fixationContentAtResize($container, this._options);
     
@@ -32,7 +33,10 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
         customScrollIFrame.reload();
     });
     //Синхронизируем с мап навигатором
-    $container.on("pmv.load.iframe", mapNavigatorIFrame.reload);
+    $container.on({
+        "pmv.load.iframe": mapNavigatorIFrame.reload,
+        "rif.center-iframe": mapNavigatorIFrame.updateDraggable
+    });
     //Синхронизируем с ресайзером
     $container.on("pmv.load.iframe", resizeIFrame.reload);
     //Синхронизируем с фиксатором контента при ресайзе
@@ -52,7 +56,6 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     this._destroy = function() {
         //Чтобы скролл работал не только в iFrame Но и во всём блоке
         $container.off('wheel', customScrollIFrame._handlerMouseWheel);
-        ____._saveSession();
         
         $container.find( ".pmv-outer-wrap" ).remove();
     }
@@ -61,8 +64,9 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
         $container.append('<div class="pmv-outer-wrap"><div class="pmv-fitting-wrap"></div></div>');
         $container.append('<div class="pmv-container-bl"></div><div class="pmv-container-bb"></div><div class="pmv-container-br"></div>');
         //Получем список страниц
+        ____.localSession = sessionModel.getLocalSessionParams();
         options.pageList = {};
-        ____._restoreSession( "pagelist" );
+        ____._restoreSession("pagelist");
         $container.on("pmv.load.iframe", function(){
             ____._restoreSession( "size_iframe" );
             ____._restoreSession( "scroll_iframe" );
@@ -71,11 +75,22 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
             resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
         });
     }
+
+    this.handlerSelectPage = function(href) {
+        ____.currentPage = href;
+        ____._destroyIFrame();
+        if(href !== null) {
+            ____._createIFrame(href);
+        }
+        $container.trigger("pmv.user.changepage");
+    }
     
     this.selectPage = function(href) {
         ____.currentPage = href;
         ____._destroyIFrame();
-        ____._createIFrame(href);
+        if(href !== null) {
+            ____._createIFrame(href);
+        }
     }
     
     this._createIFrame = function(href) {
@@ -92,73 +107,47 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     }
     
     this._destroyIFrame = function() {
-        ____._saveSession();        
         $( '#'+(____._options.nameIFrame) ).remove();
     }
     
     this._restoreSession = function( specific ) {
-        if( !("$session" in ____) ) {
-            ____.$session.find( "pages page" ).each(function(){
-                ____._options.pageList[$(this).attr("href")] = {
-                    active: ($(this).attr("active") == "true") ? true : false
-                }
-            });
-        }
-        
         switch( specific ) {
             //Загрузка активной страницы 
             case "pagelist":
-                for(var key in ____._options.pageList) {
-                    if(____._options.pageList[key].active) {
-                        ____.selectPage(key);
-                        break;
-                    }
-                } 
+                if( ____.localSession && "pages" in ____.localSession ) {
+                    ____.selectPage("/" + ____.localSession.pages.currentPage);
+                } else {
+
+                }
                 break;
             case "scroll_iframe":
                 var iframe = window[____._options.nameIFrame];
-                var scrollTop, scrollLeft;
-                
-                var $page = ____.$session.find( " page[href='"+____.lastLoadPage+"'][scrolltop][scrollleft]" );
-                if( $page.size() && ____.lastLoadPage in ____._options.pageList ) {
-                    scrollTop = parseInt( $page.attr( "scrolltop" ) );
-                    scrollLeft = parseInt( $page.attr( "scrollleft" ) );
-                    
-                    $(iframe.window).scrollTop( scrollTop );
-                    $(iframe.window).scrollLeft( scrollLeft );
+
+                if( ____.localSession && "iframe" in ____.localSession ) {
+                    $(iframe.window).scrollTop( ____.localSession.iframe.scroll.top );
+                    $(iframe.window).scrollLeft( ____.localSession.iframe.scroll.left );
                 }
                 break;
-            case "position_iframe": 
-                var iframe = window[____._options.nameIFrame];
+            case "position_iframe":
                 var $iframe = $("#"+(____._options.nameIFrame));
                 var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
-                var t, l;
-                
-                var $page = ____.$session.find( " page[href='"+____.lastLoadPage+"'][l][t]" );
-                if( $page.size() && ____.lastLoadPage in ____._options.pageList ) {
-                    l = parseInt( $page.attr( "l" ) );
-                    t = parseInt( $page.attr( "t" ) );
-                    
+
+                if( ____.localSession && "iframe" in ____.localSession ) {
+                    //доделать чтоб учитывались проценты
                     $fittingWrap.css({
-                        left: l,
-                        top: t
+                        left: ____.localSession.iframe.position.top,
+                        top: ____.localSession.iframe.position.left
                     });
                 }
                 break;
             case "size_iframe":
-                var iframe = window[____._options.nameIFrame];
                 var $iframe = $("#"+(____._options.nameIFrame));
                 var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
-                var w, h;
-                
-                var $page = ____.$session.find( " page[href='"+____.lastLoadPage+"'][w][h]" );
-                if( $page.size() ) {
-                    w = parseInt( $page.attr( "w" ) );
-                    h = parseInt( $page.attr( "h" ) );
-                    
+
+                if( ____.localSession && "iframe" in ____.localSession ) {
                     $fittingWrap.css({
-                        width: w,
-                        height: h
+                        width: ____.localSession.iframe.size.w,
+                        height: ____.localSession.iframe.size.h
                     });
                 }
                 break;
@@ -166,7 +155,7 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     }
     
     this._saveSession = function() {
-        if( "$session" in ____ ) {
+        /*if( "$session" in ____ ) {
             //Сохраняем страницы (синхронизируем pageList и xml)
                 var $pages = ____.$session.find( " pages" );
                 var pre_href;
@@ -223,29 +212,10 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
                 type: "POST",
                 data: ({module: 'setfile', dir: ____._options.urlXML, file_text: resxml, text_encoding: 'UTF-8'})
             });
-        }
+        }*/
     }
-    
-    this._restoreSessionFromSubModules = function() {
-        resizeIFrame._restoreSession();
-        customScrollIFrame._restoreSession();
-        mapNavigatorIFrame._restoreSession();
-        
-        resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
-    }          
 }
-    
-/*jQuery.fn.responsiveBlock = function(options){
-    options = $.extend({
-        defColor:"white",
-        hoverColor:"red"
-    }, options});
 
-    var make = function(){
-        
-    };
-
-    return this.each(make);*/
     modules.pageManagerVisualizator = pageManagerVisualizator;
     
 })(jQuery);

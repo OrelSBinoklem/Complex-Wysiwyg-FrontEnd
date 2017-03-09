@@ -92,11 +92,94 @@ jQuery(function($) {
         })();
 
         /****************************************************/
+        /*Синхронизация по группам сессий*/
+        /****************************************************/
+        (function() {
+            //Свернуть-развернуть список выбора групп
+            $(".pmv__btn-open-groups-session").on("click", function () {
+                $(this).toggleClass('active');
+            });
+            var dragItemList = false;
+            $("body").on("click click.body.iframe", function (e) {
+                if( $(e.target).closest($(".pmv__btn-open-groups-session").add($(".shab__session-groups-list"))).length == 0 && !dragItemList ) {
+                    $(".pmv__btn-open-groups-session").removeClass('active');
+                }
+            });
+
+            $(".shab__session-groups-list").append("<ul class='shab__session-groups-list-ul'></ul>");
+            refreshMenuView();
+            $(".shab__session-groups-list-ul").sortable({
+                    axis: "y",
+                    //handle: 'button',
+                    items: "> li"
+                })
+                .disableSelection();
+            function refreshMenuView() {
+                if(session.sessionGroupSynchronizations.length) {
+                    var haveCookie = $.cookie('adaptive_pixel_perfect_groups_session') !== undefined;
+                    var activeGroups;
+
+                    if(haveCookie) {
+                        activeGroups = $.secureEvalJSON($.cookie('adaptive_pixel_perfect_groups_session')).groups;
+                        //список в обьект по именам групп сессий
+                        var sessionGroupsForNames = {};
+                        for(var key in session.sessionGroupSynchronizations) {
+                            var one = session.sessionGroupSynchronizations[key];
+                            sessionGroupsForNames[one.name] = one;
+                        }
+
+                        //Удаляем имена выбранных групп которых уже нету
+                        activeGroups.filter(function(item, i, arr) {
+                            return item in sessionGroupsForNames;
+                        });
+                        $.cookie('adaptive_pixel_perfect_groups_session', $.toJSON({"groups": activeGroups}));
+                        if(!activeGroups.length) {
+                            $.removeCookie('adaptive_pixel_perfect_groups_session');
+                            haveCookie = false;
+                            activeGroups = [];
+                        }
+                    }
+                    var activeGroupsObj = {};
+                    for(var i in activeGroups) {
+                        activeGroupsObj[activeGroups[i]] = true;
+                    }
+
+                    //Формируем меню
+                    var html = "";
+
+                    for(var key in session.sessionGroupSynchronizations) {
+                        var oneGroup = session.sessionGroupSynchronizations[key];
+
+                        var activeParamsObj = {};
+                        for(var i in oneGroup.synchroParams) {
+                            activeParamsObj[oneGroup.synchroParams[i]] = true;
+                        }
+
+                        var active = (haveCookie && (oneGroup.name in activeGroupsObj))?"active":"";
+                        html += '<li class="shab__session-groups-list-item '+active+'" data-name="'+(oneGroup.name)+'">' +
+                            '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn '+(("pages"       in activeParamsObj)?"active":"")+'" data-param="pages"><i class="fa fa-file-o"></i></button>' +
+                            '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn '+(("resolutions" in activeParamsObj)?"active":"")+'" data-param="resolutions"><i class="fa fa-arrows"></i></button>' +
+                            '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn '+(("iframe"      in activeParamsObj)?"active":"")+'" data-param="iframe"><i class="fa fa-desktop"></i></button>' +
+                            '<button class="btn btn-default btn-xs btn-block shab__session-groups-list-btn">'+(oneGroup.name)+'</button>' +
+                            '<div class="btn btn-default btn-xs shab__session-groups-btn-drag"><span class="glyphicon glyphicon-move"></span></div>' +
+                            '</li>';
+                    }
+
+                    $(".shab__session-groups-list-ul").empty().append(html);
+                } else {
+                    if($.cookie('adaptive_pixel_perfect_groups_session') !== undefined) {
+                        $.removeCookie('adaptive_pixel_perfect_groups_session');
+                    }
+                }
+            }
+        })();
+
+        /****************************************************/
         /*Менеджер страниц и визуализатор*/
         /****************************************************/
         (function() {
             pageManagerVisualizator = new modules.pageManagerVisualizator($("#wrap_iframe"), session, {
-                $mapNavigatorContainer: $('.shab__main-menu-container'),
+                $mapNavigatorContainer: $('.mnif__navigator-window'),
                 nameIFrame: "PP_iframe",
                 pixelsScrollableInSeconds: 2000,
                 minWOuterScroll: 23,
@@ -105,7 +188,8 @@ jQuery(function($) {
                 minHDraggable: 15,
                 minWIFrame: 320,
                 minHIFrame: 480,
-                responsiveToMovementOfTheCursorInAConfinedSpace: false,
+                responsiveToMovementOfTheCursorInAConfinedSpace: true,
+                movementOfTheCursorInAConfinedSpaceSpred: 10,
                 gorizontalFixation: "center",
                 verticalFixation: "top"
             });
@@ -130,20 +214,33 @@ jQuery(function($) {
                 }
             });
 
+            //Открыть-закрыть меню выбора страниц
             $(".pmv__select-page-open-list").on("click", function () {
-                if( !$(this).hasClass('active') ) {
-                    $(this).addClass('active');
-                } else {
-                    $(this).removeClass('active');
-                }
+                $(this).toggleClass('active');
             });
             var dragItemList = false;
             $("body").on("click click.body.iframe", function (e) {
                 if( $(e.target).closest($(".pmv__select-page-open-list").add($(".pmv__pages-window")).add($("#modal-pmv-add-page-href"))).length == 0 && !dragItemList ) {
-                    if( $(".pmv__select-page-open-list").hasClass('active') ) {
-                        $(".pmv__select-page-open-list").removeClass('active');
-                    }
+                    $(".pmv__select-page-open-list").removeClass('active');
                 }
+            });
+
+            //Сменяем страницу
+            $('.pmv__pages-sortable').on('click', ' .pmv__pages-btn-page', function() {
+                $(".pmv__pages-btn-page").removeClass("active");
+                $(this).addClass("active");
+                pageManagerVisualizator.handlerSelectPage( $(this).closest(".pmv__pages-item").attr("data-name") );
+                if( $(".pmv__select-page-open-list").hasClass('active') ) {
+                    $(".pmv__select-page-open-list").removeClass('active');
+                }
+            });
+            $("body").on("pmv.user.changepage", function(){
+                session.changePage(pageManagerVisualizator.currentPage);
+            });
+            $("body").on("synchro.changed_page", function(e, page){
+                $(".pmv__pages-btn-page").removeClass("active");
+                $(".pmv__pages-item[data-name='"+page+"'] > * > .pmv__pages-btn-page").addClass("active");
+                session.selectPage(page);
             });
 
             //Добавляем страницу
@@ -180,11 +277,6 @@ jQuery(function($) {
                 });
             });
 
-            //Сменяем страницу
-            $('.shab__top-menu').on('change', ' .select-page.selectpicker', function() {
-                pageManagerVisualizator.selectPage( $('.shab__top-menu .select-page option:selected').first().attr('data-href') );
-            });
-
             //Обновляем страницу
             $('.pmv__update-iframe-btn').on('click', pageManagerVisualizator.reloadPage);
 
@@ -193,21 +285,23 @@ jQuery(function($) {
             refreshMenuView();
             
             function refreshMenuView() {
+                var localSession = session.getLocalSessionParams();
                 dragItemList = false;
                 var $main = $(".pmv__pages-sortable");
                 $main.empty();
-                //session
+
                 var res = (function recursion(el, html) {
                     html += "<ul>";
 
                     //li
                     for(var i in el) {
                         var name = (el[i].type == "page") ? el[i].urn : el[i].name;
-                        var _class = (el[i].type == "page")?"page":"group";
+                        var _class = (el[i].type == "page")?"page":"group btn-yellow";
+                        var active = (el[i].type == "page" && localSession && "pages" in localSession && localSession.pages.currentPage === name)?"active":"";
                         html += "<li class='pmv__pages-item "+(("collapsed" in el[i] && el[i].collapsed)?"collapsed":"")+"' data-type='"+(el[i].type)+"' data-name='"+name+"'>";
                         html += '<div class="pmv__pages-item-content">' +
                             '<button class="btn btn-default btn-xs pmv__pages-btn-collapsed"><span class="glyphicon glyphicon-minus"></span><span class="glyphicon glyphicon-plus"></span></button>' +
-                            '<button class="btn btn-default btn-xs btn-block pmv__pages-btn-'+_class+'">'+name+'</button>' +
+                            '<button class="btn btn-default btn-xs btn-block pmv__pages-btn-'+_class+' '+active+'">'+name+'</button>' +
                             '<div class="btn btn-default btn-xs pmv__pages-btn-drag"><span class="glyphicon glyphicon-move"></span></div>' +
                             '</div>';
 
@@ -223,7 +317,7 @@ jQuery(function($) {
                     //li (end)
 
                     return html += "</ul>";
-                })(session.data.pages, "", 0);
+                })(session.globalSession.pages, "", 0);
 
                 $main.append(res);
                 $main.find(" > ul").nestedSortable({
@@ -532,10 +626,6 @@ jQuery(function($) {
         /*Вспомогательная хрень*/
         /****************************************************/
         $(document).ready(function(){
-            pageManagerVisualizator.$container.on( "pmv.load.iframe", function(){
-                shablonizator.updateBasesUrlPage( pageManagerVisualizator.lastLoadPage );
-            });
-
             //Подсказки
             $('[data-toggle="tooltip"]').tooltip();
             $('[data-toggle="popover"]').popover();

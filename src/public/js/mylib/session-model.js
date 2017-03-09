@@ -2,6 +2,8 @@
     var sessionModel = function(data, socket) {
         var ____ = this;
         ____.data = data;
+        ____.globalSession = ____.data.globalSession;
+        ____.sessionGroupSynchronizations = ____.data.sessionGroupSynchronizations;
 
         /*********************************/
         /*Общая синхронизация*/
@@ -10,26 +12,111 @@
         /*Синхронизации сессий*/
         /*Страницы*/
         this.savePages = function() {
-            socket.emit('modified_pages', ____.data.pages);
-            console.log(____.data.pages);
+            socket.emit('modified_pages', ____.globalSession.pages);
         }
         /*Разрешения экрана*/
         /*Скриншоты*/
 
-        /*********************************/
-        /*Синхронизация по группам сессий*/
-        /*********************************/
-        this.getSessionFromGroups = function(groups) {
-            if(groups.length) {
+        /******************************************************/
+        /*Синхронизация по группам сессий и сохранение в cookies
+        * если браузер неподключён ни к одной из групп*/
+        /******************************************************/
+        this.getLocalSessionParams = function() {
+            if(____.data.sessionGroupSynchronizations.length) {
+                if($.cookie('adaptive_pixel_perfect_groups_session') !== undefined) {
+                    var sessionGroups = $.secureEvalJSON($.cookie('adaptive_pixel_perfect_groups_session')).groups;
+                    //список в обьект по именам групп сессий
+                    var sessionGroupsForNames = {};
+                    for(var key in ____.data.sessionGroupSynchronizations) {
+                        var one = ____.data.sessionGroupSynchronizations[key];
+                        sessionGroupsForNames[one.name] = one;
+                    }
 
+                    //Удаляем имена выбранных групп которых уже нету
+                    sessionGroups.filter(function(item, i, arr) {
+                        return item in sessionGroupsForNames;
+                    });
+                    $.cookie('adaptive_pixel_perfect_groups_session', $.toJSON({"groups": sessionGroups}));
+                    if(!sessionGroups.length) {
+                        $.removeCookie('adaptive_pixel_perfect_groups_session');
+                        return notObjectSession();
+                    } else {
+                        var resObj = {};
+                        for(var key in sessionGroups) {
+                            var dataSession = sessionGroupsForNames[sessionGroups[key]].data;
+                            for(var param in dataSession) {
+                                if(!(param in resObj)) {
+                                    resObj[param] = dataSession[param];
+                                }
+                            }
+                        }
+                        //Добавим и то что в куках
+                        if($.cookie('adaptive_pixel_perfect_browser_session') !== undefined) {
+                            var dataSession = $.secureEvalJSON($.cookie('adaptive_pixel_perfect_browser_session'));
+                            for(var param in dataSession) {
+                                if(!(param in resObj)) {
+                                    resObj[param] = dataSession[param];
+                                }
+                            }
+                        }
+
+                        return resObj;
+                    }
+                } else {
+                    return notObjectSession();
+                }
             } else {
-                //Берём сессию для текущего браузера из куков
+                if($.cookie('adaptive_pixel_perfect_groups_session') !== undefined) {
+                    $.removeCookie('adaptive_pixel_perfect_groups_session');
+                }
+                return notObjectSession();
+            }
 
+            function notObjectSession() {
+                //Берём сессию для текущего браузера из куков
+                if($.cookie('adaptive_pixel_perfect_browser_session') !== undefined) {
+                    //Берём сессию для текущего браузера из куков
+                    return $.secureEvalJSON($.cookie('adaptive_pixel_perfect_browser_session'));
+                } else {
+                    return false;
+                }
             }
         }
+
         /*Страницы*/
+        this.changePage = function(page) {
+            socket.emit('local.change_page', page);
+
+            //Сохраняем в куки
+            if($.cookie('adaptive_pixel_perfect_browser_session') === undefined) {
+                var dataSession = {
+                    "pages": {
+                        "currentPage": page
+                    }
+                }
+                $.cookie('adaptive_pixel_perfect_browser_session', $.toJSON(dataSession));
+
+            } else {
+                var dataSession = $.secureEvalJSON($.cookie('adaptive_pixel_perfect_browser_session'));
+                if(!("pages" in dataSession)) {
+                    dataSession.pages = {
+                        "currentPage": page
+                    }
+                } else {
+                    dataSession.pages.currentPage = page;
+                }
+                $.cookie('adaptive_pixel_perfect_browser_session', $.toJSON(dataSession));
+            }
+        }
+        socket.on('local.change_page', function(page) {
+            $("body").trigger("synchro.changed_page", [page]);
+        });
         /*Разрешения экрана*/
         /*Айфрейм с вёрсткой*/
+
+        /***********************************/
+        /*Сессия в самом браузере (cookies)*/
+        /***********************************/
 
         this.getPage = function(urn) {
             return (function recursion(el) {
@@ -46,7 +133,7 @@
                 }
 
                 return false;
-            })(____.data.pages);
+            })(____.globalSession.pages);
         }
 
             this.getCurrentPage = function() {
@@ -87,7 +174,7 @@
 
         this.addPage = function(urn) {
             if(this.getPage(urn) === false) {
-                ____.data.pages.shift({
+                ____.globalSession.pages.shift({
                     type: "page",
                     urn: urn
                 });
@@ -96,7 +183,7 @@
 
         this.addGroup = function(name) {
             if(this.getPage(name) === false) {
-                ____.data.pages.shift({
+                ____.globalSession.pages.shift({
                     type: "group",
                     name: name
                 });
@@ -104,7 +191,7 @@
         }
 
         /*this.updatePage = function() {
-            socket.emit('session.save', ____.data);
+            socket.emit('session.save', ____.globalSession);
         }*/
 
         this.deletePage = function(urn, nestedDelete) {
@@ -128,7 +215,7 @@
                 }
 
                 return false;
-            })(____.data.pages);
+            })(____.globalSession.pages);
         }
 
         this.deleteGroup = function(name, nestedDelete) {
@@ -152,7 +239,7 @@
                 }
 
                 return false;
-            })(____.data.pages);
+            })(____.globalSession.pages);
         }
     }
 

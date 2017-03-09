@@ -1,0 +1,46 @@
+{
+  "name": "adaptive-pixel-perfect",
+  "version": "0.0.1",
+  "description": "Pixel perfect for multiple resolutions",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "public"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pixelperfect",
+    "browsersync"
+  ],
+  "author": "OrelSBinoklem",
+  "license": "MIT",
+  "dependencies": {
+    "del": "^2.2.2",
+    "express": "^4.14.1",
+    "gulp": "^3.8.11",
+    "gulp-changed": "^2.0.0",
+    "gulp-image-resize": "^0.12.0",
+    "gulp-watch": "^4.3.10",
+    "resize-img": "^1.1.2",
+    "socket.io": "^1.7.3",
+    "through2": "^2.0.3"
+  },
+  "devDependencies": {
+    "browser-sync": "~2.13.0",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-clean-css": "^2.0.13",
+    "gulp-concat": "^2.6.1",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-minify-css": "^1.0.0",
+    "gulp-rigger": "^0.5.8",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.4.1",
+    "gulp-uglify": "^2.0.0"
+  }
+}
