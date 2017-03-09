@@ -118,7 +118,10 @@ jQuery(function($) {
             $(".shab__session-groups-list-ul").sortable({
                     axis: "y",
                     //handle: 'button',
-                    items: "> li"
+                    items: "> li",
+                    update: function() {
+                        $(".shab__session-groups-list").trigger("shab.user.change_session_group");
+                    }
                 })
                 .disableSelection();
             function refreshMenuView() {
@@ -197,6 +200,7 @@ jQuery(function($) {
                         '<button class="btn btn-default btn-xs shab__session-groups-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
                         '</li>';
                     $(".shab__session-groups-list-ul").append(html);
+                    $(".shab__session-groups-list").trigger("shab.user.change_session_group");
                 } else {
                     alert("Имя недолжно быть пустым");
                 }
@@ -215,6 +219,8 @@ jQuery(function($) {
             $('#shab-delete-group-session .btn-select').on('click', function(){
                 var name = $('#shab-delete-group-session .shab-delete-group-session__name').attr("data-name");
                 $(".shab__session-groups-list-item[data-name='"+name+"']").remove();
+
+                $(".shab__session-groups-list").trigger("shab.user.change_session_group");
 
                 $('#shab-delete-group-session .modal').modal('hide');
             });
@@ -239,6 +245,7 @@ jQuery(function($) {
                 } else {
                     $(this).removeClass("active");
                 }
+                $(".shab__session-groups-list").trigger("shab.user.change_session_group");
             });
 
             $("body").on("shab.user.change_session_group", function(){
