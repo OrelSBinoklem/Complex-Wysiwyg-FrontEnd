@@ -21,23 +21,48 @@
     right: 0
     padding: 5px
 
-.pmv__btn-open-groups-session
+.shab__btn-open-groups-session
     .caret
         border-top: 0
         border-bottom: 4px dashed
 
+.shab__add-group-session
+    display: none
+    position: absolute
+    bottom: 5px
+    right: 0
+
+.shab__session-groups-list.open
+    .shab__add-group-session
+        display: inline-block
+
 .shab__session-groups-list
+    position: relative
     margin-bottom: 5px
     border-bottom: 1px dashed #999
+    &.open
+        padding-bottom: 33px
 
 .shab__session-groups-list-item
+    display: none
     position: relative
     ~ .shab__session-groups-list-item
         margin-top: 5px
+    &.active
+        display: block
+
+.shab__session-groups-list.open .shab__session-groups-list-item
+    display: block
 
 .shab__session-groups-list.open
     .shab__session-groups-list-item
         height: 40px
+
+.shab__session-groups-list-btn
+    font-weight: bold
+    text-align: left
+    &.active
+        box-shadow: inset 2px 0 0 0 #000
 
 .shab__session-groups-btn-drag
     display: none
@@ -54,11 +79,12 @@
     margin-top: 5px
     outline: #4183C4 dashed 1px
 
-.shab__session-groups-synchro-params-btn
+.shab__main-menu-container .shab__session-groups-synchro-params-btn
+    display: none
     position: absolute
     left: 0
     top: 20px
-    box-shadow: none
+    box-shadow: 0 2px 2px -1px rgba(0,0,0,0.5)
     width: 22px
     height: 20px
     &.active
@@ -67,6 +93,24 @@
         left: 22px
     &[data-param="iframe"]
         left: 44px
+
+.shab__main-menu-container .shab__session-groups-delete-btn
+    display: none
+    position: absolute
+    right: 0
+    top: 20px
+    box-shadow: 0 2px 2px -1px rgba(0,0,0,0.5)
+    width: 22px
+    height: 20px
+    &.active
+        box-shadow: inset 0 -2px 0 0 #000
+
+.shab__session-groups-list.open
+    .shab__session-groups-synchro-params-btn, .shab__session-groups-delete-btn
+        display: inline-block
+
+#shab-add-group-session .form-group
+    margin-bottom: 0
 
 .shab__global-settings
     display: none
@@ -166,7 +210,7 @@
                 word-wrap: break-word
                 white-space: pre-wrap
                 &.active
-                    box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.5), inset 0 -2px 0 0 #000
+                    box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.5), inset 0 -2px 0 0 #c00
     &__add-page-group
         position: absolute
         top: 0

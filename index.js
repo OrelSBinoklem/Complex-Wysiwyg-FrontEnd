@@ -44,7 +44,7 @@ __.prototype.init = function() {
         ____.io.sockets.on('connection', function (socket) {
             socket.emit('session.load', ____.sessionModel.session);
             
-            socket.on('modified_pages', function (data) {
+            socket.on('global.modified_pages', function (data) {
                 //console.log(data);
                 ____.sessionModel.session.globalSession.pages = data;
                 ____.sessionModel.sessionChange = true;

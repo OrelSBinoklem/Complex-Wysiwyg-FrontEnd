@@ -83,8 +83,10 @@
             <div class="pmv__pages-sortable-scrollwrap"><div class="pmv__pages-sortable"></div></div>
         </div>
         <div class="shab__main-menu-bottom-section">
-            <div class="shab__session-groups-list open"></div>
-            <button class="pmv__btn-open-groups-session btn btn-default btn-block">Сессии <span class="caret"></span></button>
+            <div class="shab__session-groups-list">
+                <button class="shab__add-group-session btn btn-default btn-sm btn-yellow" data-toggle="tooltip" data-placement="bottom" title="Добавить группу"><span class="fa fa-plus-circle"></span></button>
+            </div>
+            <button class="shab__btn-open-groups-session btn btn-default btn-block">Сессии <span class="caret"></span></button>
         </div>
     </div>
 
@@ -184,6 +186,47 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Закрыть</button>
                     <button type="button" class="btn btn-primary btn-select">Выбрать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shab-add-group-session">
+    <div class="modal fade bs-example-modal-sm">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Введите название</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <input type="text" class="form-control shab-add-group-session__name" placeholder="Имя">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary btn-select">Ок</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shab-delete-group-session">
+    <div class="modal fade bs-example-modal-sm">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Точно удалить группу &quot;<span class="shab-delete-group-session__name" data-name=""></span>&quot;?</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary btn-select">Ок</button>
                 </div>
             </div>
         </div>

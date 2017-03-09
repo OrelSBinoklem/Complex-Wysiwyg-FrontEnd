@@ -10,9 +10,31 @@
         /*********************************/
 
         /*Синхронизации сессий*/
+        this.menuJsonToGroupsSessionJson = function(listGroupsAndActiveParameters) {
+            var sessionGroupsForNames = {};
+            for(var key in ____.sessionGroupSynchronizations) {
+                var one = ____.sessionGroupSynchronizations[key];
+                sessionGroupsForNames[one.name] = one;
+            }
+
+            for(var i in listGroupsAndActiveParameters) {
+                var one = listGroupsAndActiveParameters[i];
+                if(one.name in sessionGroupsForNames) {
+                    one.data = sessionGroupsForNames[one.name].data;
+                } else {
+                    one.data = {};
+                }
+            }
+            ____.sessionGroupSynchronizations = listGroupsAndActiveParameters;
+        }
+
+        this.modifiedSessionGroupList = function() {
+            socket.emit('global.modified_session_group_list', ____.sessionGroupSynchronizations);
+        }
+
         /*Страницы*/
         this.savePages = function() {
-            socket.emit('modified_pages', ____.globalSession.pages);
+            socket.emit('global.modified_pages', ____.globalSession.pages);
         }
         /*Разрешения экрана*/
         /*Скриншоты*/
@@ -43,8 +65,10 @@
                     } else {
                         var resObj = {};
                         for(var key in sessionGroups) {
+                            var activeGroups = sessionGroupsForNames[sessionGroups[key]].synchroParams;
                             var dataSession = sessionGroupsForNames[sessionGroups[key]].data;
-                            for(var param in dataSession) {
+
+                            for(var param in activeGroups) {
                                 if(!(param in resObj)) {
                                     resObj[param] = dataSession[param];
                                 }
@@ -83,6 +107,11 @@
             }
         }
 
+        /*Синхронизации сессий*/
+        this.selectSessionGroup = function() {
+            socket.emit('local.select_session_group', ____.globalSession.pages);
+        }
+
         /*Страницы*/
         this.changePage = function(page) {
             socket.emit('local.change_page', page);
@@ -113,10 +142,6 @@
         });
         /*Разрешения экрана*/
         /*Айфрейм с вёрсткой*/
-
-        /***********************************/
-        /*Сессия в самом браузере (cookies)*/
-        /***********************************/
 
         this.getPage = function(urn) {
             return (function recursion(el) {

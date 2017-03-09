@@ -96,17 +96,24 @@ jQuery(function($) {
         /****************************************************/
         (function() {
             //Свернуть-развернуть список выбора групп
-            $(".pmv__btn-open-groups-session").on("click", function () {
-                $(this).toggleClass('active');
+            $(".shab__btn-open-groups-session").on("click", function () {
+                if(!$(this).hasClass('active')) {
+                    $(this).addClass('active');
+                    $(".shab__session-groups-list").addClass('open');
+                } else {
+                    $(this).removeClass('active');
+                    $(".shab__session-groups-list").removeClass('open');
+                }
             });
-            var dragItemList = false;
             $("body").on("click click.body.iframe", function (e) {
-                if( $(e.target).closest($(".pmv__btn-open-groups-session").add($(".shab__session-groups-list"))).length == 0 && !dragItemList ) {
-                    $(".pmv__btn-open-groups-session").removeClass('active');
+                if( $(e.target).closest($(".shab__btn-open-groups-session").add($(".shab__session-groups-list")).add($("#shab-add-group-session")).add($("#shab-delete-group-session"))).length == 0 ) {
+                    $(".shab__btn-open-groups-session").removeClass('active');
+                    $(".shab__session-groups-list").removeClass('open');
                 }
             });
 
-            $(".shab__session-groups-list").append("<ul class='shab__session-groups-list-ul'></ul>");
+            //Формирование меню групп сессий
+            $(".shab__session-groups-list").prepend("<ul class='shab__session-groups-list-ul'></ul>");
             refreshMenuView();
             $(".shab__session-groups-list-ul").sortable({
                     axis: "y",
@@ -160,8 +167,9 @@ jQuery(function($) {
                             '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn '+(("pages"       in activeParamsObj)?"active":"")+'" data-param="pages"><i class="fa fa-file-o"></i></button>' +
                             '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn '+(("resolutions" in activeParamsObj)?"active":"")+'" data-param="resolutions"><i class="fa fa-arrows"></i></button>' +
                             '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn '+(("iframe"      in activeParamsObj)?"active":"")+'" data-param="iframe"><i class="fa fa-desktop"></i></button>' +
-                            '<button class="btn btn-default btn-xs btn-block shab__session-groups-list-btn">'+(oneGroup.name)+'</button>' +
+                            '<button class="btn btn-default btn-xs btn-block shab__session-groups-list-btn '+active+'">'+(oneGroup.name)+'</button>' +
                             '<div class="btn btn-default btn-xs shab__session-groups-btn-drag"><span class="glyphicon glyphicon-move"></span></div>' +
+                            '<button class="btn btn-default btn-xs shab__session-groups-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
                             '</li>';
                     }
 
@@ -171,6 +179,85 @@ jQuery(function($) {
                         $.removeCookie('adaptive_pixel_perfect_groups_session');
                     }
                 }
+            }
+
+            //Добавить группу
+            $('.shab__add-group-session').on('click', function(){
+                $('#shab-add-group-session .modal').modal('show');
+            });
+            $('#shab-add-group-session .btn-select').on('click', function(){
+                var name = $('#shab-add-group-session .shab-add-group-session__name').val();
+                if($.trim(name)) {
+                    var html = '<li class="shab__session-groups-list-item" data-name="'+($.trim(name))+'">' +
+                        '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn" data-param="pages"><i class="fa fa-file-o"></i></button>' +
+                        '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn" data-param="resolutions"><i class="fa fa-arrows"></i></button>' +
+                        '<button class="btn btn-default btn-xs shab__session-groups-synchro-params-btn" data-param="iframe"><i class="fa fa-desktop"></i></button>' +
+                        '<button class="btn btn-default btn-xs btn-block shab__session-groups-list-btn">'+($.trim(name))+'</button>' +
+                        '<div class="btn btn-default btn-xs shab__session-groups-btn-drag"><span class="glyphicon glyphicon-move"></span></div>' +
+                        '<button class="btn btn-default btn-xs shab__session-groups-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
+                        '</li>';
+                    $(".shab__session-groups-list-ul").append(html);
+                } else {
+                    alert("Имя недолжно быть пустым");
+                }
+                $('#shab-add-group-session .modal').modal('hide');
+            });
+
+            //Удалить группу
+            $('.shab__session-groups-list').on('click', " .shab__session-groups-delete-btn", function(){
+                $('#shab-delete-group-session .modal').modal('show');
+
+                var name = $(this).closest(".shab__session-groups-list-item").attr("data-name");
+                $('#shab-delete-group-session .shab-delete-group-session__name')
+                    .attr("data-name", name)
+                    .text(name);
+            });
+            $('#shab-delete-group-session .btn-select').on('click', function(){
+                var name = $('#shab-delete-group-session .shab-delete-group-session__name').attr("data-name");
+                $(".shab__session-groups-list-item[data-name='"+name+"']").remove();
+
+                $('#shab-delete-group-session .modal').modal('hide');
+            });
+
+            //Активировать-деактивировать группу
+            $('.shab__session-groups-list').on('click', " .shab__session-groups-list-btn", function(){
+                if($(".shab__session-groups-list.open").length) {
+                    if(!$(this).hasClass("active")) {
+                        $(this).addClass("active")
+                            .closest(".shab__session-groups-list-item").addClass("active");
+                    } else {
+                        $(this).removeClass("active")
+                            .closest(".shab__session-groups-list-item").removeClass("active");
+                    }
+                }
+            });
+
+            //Активировать-деактивировать параметр группы
+            $('.shab__session-groups-list').on('click', " .shab__session-groups-synchro-params-btn", function(){
+                if(!$(this).hasClass("active")) {
+                    $(this).addClass("active");
+                } else {
+                    $(this).removeClass("active");
+                }
+            });
+
+            $("body").on("shab.user.change_session_group", function(){
+                groupsSessionToJson();
+                session.modifiedSessionGroupList();
+            });
+            function groupsSessionToJson($main) {
+                var sessionGroupSynchronizations = [];
+                $main.find(" .shab__session-groups-list-ul > li").each(function() {
+                    var activeParams = [];
+                    $(this).find(" .shab__session-groups-synchro-params-btn.active").each(function() {
+                        activeParams.push($(this).attr("data-param"));
+                    });
+                    sessionGroupSynchronizations.push({
+                        name: $(this).attr("data-name"),
+                        synchroParams: activeParams
+                    });
+                });
+                session.menuJsonToGroupsSessionJson(sessionGroupSynchronizations);
             }
         })();
 
