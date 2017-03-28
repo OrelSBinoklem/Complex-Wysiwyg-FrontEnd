@@ -55,8 +55,6 @@
     <script type="text/javascript" src="js/mylib/page-manager-visualizator/page-manager-visualizator.js"></script>
 
     <!--pixel-perfect-->
-    <link rel="stylesheet" href="js/mylib/pixel-perfect/screenshots-manipulator.css">
-    <script type="text/javascript" src="js/mylib/pixel-perfect/screenshots-manipulator.js"></script>
     <link rel="stylesheet" href="js/mylib/pixel-perfect/pixel-perfect.css">
     <script type="text/javascript" src="js/mylib/pixel-perfect/pixel-perfect.js"></script>
 
@@ -64,10 +62,13 @@
     <script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
-    <div  id="testovaya_ssilka"><a href="#" class="btn btn-default" style="padding-left: 15px; position: fixed; left: 500px; top: 0; z-index: 100000;">Тест 1</a></div>
-
     <div class="shab__main-menu-container">
         <div class="mnif__navigator-window"></div>
+        <div class="pp__verstka-design btn-group btn-group-justified btn-toggle-one-color">
+            <a href="#" class="pp__verstka-btn btn btn-primary active" data-btn-color="primary"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Вёрстка"><i class="fa fa-code"></i></span></a>
+            <a href="#" class="pp__50p-btn btn btn-default" data-btn-color="warning"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Полупрозрачная вёрстка поверх дизайна"><i class="fa fa-files-o"></i></span></a>
+            <a href="#" class="pp__design-btn btn btn-default" data-btn-color="danger"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Изображение дизайна"><i class="fa fa-picture-o"></i></span></a>
+        </div>
         <button class="pmv__select-page-open-list btn btn-default btn-block">Страницы <span class="caret"></span></button>
         <div class="pmv__pages-window">
             <div class="pmv__pages-top-menu">
@@ -82,6 +83,24 @@
             </div>
             <div class="pmv__pages-sortable-scrollwrap"><div class="pmv__pages-sortable"></div></div>
         </div>
+        <button class="pp__btn-open-screenshots btn btn-default btn-block">Разрешения</button>
+        <div class="pp__resolutions-menu">
+            <ul class="pp__resolutions-list"></ul>
+        </div>
+        <div class="pp__screenshots-menu-window">
+            <div class="pp__screenshots-menu-top-panel">
+                <button class="pp__add-resolution-btn btn btn-default btn-sm btn-yellow" data-toggle="tooltip" data-placement="bottom" title="Добавить разрешение"><span class="fa fa-plus-circle"></span></button>
+            </div>
+            <div class="pp__screenshots-menu-scrollwrap">
+                <div class="pp__screenshots-menu"></div>
+            </div>
+        </div>
+        <div class="pp__screenshots-files-menu-scrollwrap"></div>
+        <div class="pp__screenshots-files-menu-scrollwrap-shadow"></div>
+        <div class="pp__screenshot-thumbnail-scrollwrap">
+            <div class="pp__screenshot-thumbnail"></div>
+        </div>
+        <div class="pp__screenshot-thumbnail-scrollwrap-shadow"></div>
         <div class="shab__main-menu-bottom-section">
             <div class="shab__session-groups-list">
                 <button class="shab__add-group-session btn btn-default btn-sm btn-yellow" data-toggle="tooltip" data-placement="bottom" title="Добавить группу"><span class="fa fa-plus-circle"></span></button>
@@ -92,19 +111,6 @@
 
     <!--<div class="shab-general-window">
         <div class="shab-general-window__top">
-            <div class="shab__top-menu">
-                <div class="pp__select-resolution">
-                    <select class="select-group selectpicker" data-width="246px"></select>
-                    <button class="add-group btn btn-default"><span class="fa fa-plus-circle"></span></button>
-                    <div class="pp-verstka-design btn-group btn-toggle-one-color">
-                        <a href="#" class="pp__verstka-btn btn btn-primary active" data-btn-color="primary"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Вёрстка"><i class="fa fa-code"></i></span></a>
-                        <a href="#" class="pp__50p-btn btn btn-default" data-btn-color="warning"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Полупрозрачная вёрстка поверх дизайна">50%</span></a>
-                        <a href="#" class="pp__design-btn btn btn-default" data-btn-color="danger"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Изображение дизайна"><i class="fa fa-picture-o"></i></span></a>
-                    </div>
-                    <button class="pp__open-btn btn btn-default"><span data-toggle="tooltip" data-placement="bottom" data-original-title="Открыть &quot;пиксель перфект&quot;"><span class="glyphicon glyphicon-th"></span></span></button>
-                </div>
-            </div>
-
             <div class="shab-global-settings-generator">
                 <button class="btn btn-default shab__global-settings-btn"><span class="glyphicon glyphicon-cog"></span></button>
             </div>
@@ -146,19 +152,51 @@
                 <div class="modal-body">
                     <form class="row">
                         <div class="col-xs-12">
-                            <input type="text" class="pmv-href form-control" value="" />
+                            <div class="form-group pmv__modal-add-page-content">
+                                <input type="text" class="pmv-href form-control" value="" />
+                                <span class="help-block pmv__modal-urn-exists">Такая страница уже существует</span>
+                                <span class="help-block pmv__modal-urn-empty">Вы ввели пустое значение</span>
+                            </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Закрыть</button>
                     <button type="button" class="btn btn-primary btn-select">Добавить</button>
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div id="modal-pp-add-group">
+<!--Модальное окно для добавления групп в "менеджер страниц и визуализатор"-->
+<div id="pmv__modal-add-group">
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Имя группы</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group pmv__modal-add-group-content">
+                                <input type="text" class="pmv__modal-name-group form-control" value="" />
+                                <span class="help-block pmv__modal-name-exists">Такая группа уже существует</span>
+                                <span class="help-block pmv__modal-name-empty">Вы ввели пустое значение</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-select">Добавить</button>
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="pp__modal-add-resolution">
     <div class="modal fade">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -169,23 +207,46 @@
                 <div class="modal-body">
                     <form class="row">
                         <div class="col-xs-6">
-                            <div class="input-group">
+                            <div class="input-group pp__modal-add-resolution-w-group">
                                 <div class="input-group-addon">w</div>
-                                <input type="text" class="form-control input-sm pp-width" placeholder="Ширина">
+                                <input type="text" class="form-control input-sm pp__modal-add-resolution-w" placeholder="Ширина">
                             </div>
                         </div>
                         <div class="col-xs-6">
-                            <div class="input-group">
+                            <div class="input-group pp__modal-add-resolution-h-group">
                                 <div class="input-group-addon">h</div>
-                                <input type="text" class="form-control input-sm pp-height" placeholder="Высота">
+                                <input type="text" class="form-control input-sm pp__modal-add-resolution-h" placeholder="Высота" value="auto">
                             </div>
                         </div>
                     </form>
-                    <div class="alert alert-warning alert-input-error" role="alert">Число от 10 до 9999</div>
+                    <form class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group pp__modal-add-resolution-errors">
+                                <span class="help-block pp__modal-val-exists">Такое разрешение уже существует!</span>
+                                <span class="help-block pp__modal-val-not-digit">Нужно ввести число от 320 до 99999 или &quot;auto&quot; в высоте</span>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary btn-select">Выбрать</button>
+                    <button type="button" class="btn btn-primary btn-select">Добавить</button>
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="pp__modal-delete-resolution">
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Точно удалить разрешение &quot;<span class="pp__modal-delete-resolution-w" data-w=""></span> | <span class="pp__modal-delete-resolution-h" data-h=""></span>&quot;?</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-select">Удалить</button>
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
                 </div>
             </div>
         </div>
@@ -209,8 +270,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-select">Добавить</button>
                     <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary btn-select">Ок</button>
                 </div>
             </div>
         </div>
@@ -226,7 +287,52 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary btn-select">Ок</button>
+                    <button type="button" class="btn btn-primary btn-select">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shab__page-or-group-delete">
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Точно удалить <span class="shab__page-or-group__type"></span> &quot;<span class="shab__page-or-group__name" data-name=""></span>&quot;?</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger shab__page-or-group-delete-nested-btn">Удалить с вложенными</button>
+                    <button type="button" class="btn btn-primary shab__page-or-group-delete-btn">Удалить</button>
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shab__page-or-group-update">
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Введите <span class="shab__page-or-group__type" data-type=""></span><span class="shab__page-or-group__name" data-name=""></span></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group pmv__modal-content">
+                                <input type="text" class="form-control shab__page-or-group-update__name" value="">
+                                <span class="help-block pmv__modal-urn-exists">Такая страница уже существует</span>
+                                <span class="help-block pmv__modal-name-exists">Такая группа уже существует</span>
+                                <span class="help-block pmv__modal-empty">Вы ввели пустое значение</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-select">Обновить</button>
+                    <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Отмена</button>
                 </div>
             </div>
         </div>

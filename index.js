@@ -24,7 +24,7 @@ var __ = function(port, dirDesignScreenshots) {
     this.server = http.createServer(this.app);
     this.io = io.listen(this.server);
 
-    this.app.use('/design-thumbnails', express.static(dirDesignScreenshots + '/design-thumbnails'));
+    this.app.use('/design-screenshots', express.static(dirDesignScreenshots));
     this.app.use('/', express.static(__dirname + '/public'));
 };
 
@@ -42,17 +42,11 @@ __.prototype.init = function() {
         ____.server.listen( ____.port || 3010 );
 
         ____.io.sockets.on('connection', function (socket) {
-            socket.emit('session.load', ____.sessionModel.session);
-            
-            socket.on('global.modified_pages', function (data) {
-                //console.log(data);
-                ____.sessionModel.session.globalSession.pages = data;
-                ____.sessionModel.sessionChange = true;
-            });
+            ____.sessionModel.connect(socket);
 
-            socket.on('disconnect', function () {
+            /*socket.on('disconnect', function () {
                 console.log('user disconnected');
-            });
+            });*/
         });
 
         setInterval(function() {

@@ -1,15 +1,222 @@
 {
-  "encoding": "Windows-1251",
-  "domain": "http://localhost:3010/",
-  "pages": [],
-  "resolutions": [
-	{"w": 1920, "h": "auto"},
-	{"w": 1280, "h": "auto"},
-	{"w": 992, "h": "auto"},
-	{"w": 768, "h": "auto"},
-	{"w": 480, "h": "auto"},
-	{"w": 320, "h": "auto"}
-  ],
-  "screenshots_manipulator": "hidden",
-  "show_page_or_design": 0
+  "globalSession": {
+    "encoding": "Windows-1251",
+    "pages": [
+      {
+        "type": "page",
+        "urn": "about2.html",
+        "sub": [
+          {
+            "type": "page",
+            "urn": "register.html"
+          },
+          {
+            "type": "page",
+            "urn": "reset.html"
+          }
+        ]
+      },
+      {
+        "type": "page",
+        "urn": "about.html",
+        "sub": [
+          {
+            "type": "group",
+            "name": "Авторизация",
+            "sub": [
+              {
+                "type": "page",
+                "urn": "about3.html"
+              },
+              {
+                "type": "page",
+                "urn": "questor-it.ru/www/case-dostaevsky.html"
+              },
+              {
+                "type": "page",
+                "urn": "questor-it.ru/www/case-help-to-mama.html"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "page",
+        "urn": "login.html"
+      }
+    ],
+    "resolutions": [
+      {
+        "w": 1920,
+        "h": "auto"
+      },
+      {
+        "w": 1280,
+        "h": "auto"
+      },
+      {
+        "w": 992,
+        "h": "auto"
+      },
+      {
+        "w": 768,
+        "h": "auto"
+      },
+      {
+        "w": 480,
+        "h": "auto"
+      },
+      {
+        "w": 320,
+        "h": "auto"
+      },
+      {
+        "w": 99999,
+        "h": 99999
+      }
+    ],
+    "designScreenshots": [
+      {
+        "type": "file",
+        "name": "+design_account+++.png",
+        "urn": "+design_account+++.png",
+        "w": 1260,
+        "h": 1790
+      },
+      {
+        "type": "file",
+        "name": "48_core_heroic.jpg",
+        "urn": "48_core_heroic.jpg",
+        "w": 600,
+        "h": 399
+      },
+      {
+        "type": "file",
+        "name": "design_basket_light.png",
+        "urn": "design_basket_light.png",
+        "w": 1260,
+        "h": 1790
+      },
+      {
+        "type": "folder",
+        "name": "ff",
+        "urn": "ff",
+        "sub": [
+          {
+            "type": "file",
+            "name": "+design_account+++.png",
+            "urn": "ff\\+design_account+++.png",
+            "w": 1260,
+            "h": 1790
+          }
+        ]
+      },
+      {
+        "type": "folder",
+        "name": "fffffffffff",
+        "urn": "fffffffffff",
+        "sub": [
+          {
+            "type": "file",
+            "name": "77113_jpg_700.jpg",
+            "urn": "fffffffffff\\77113_jpg_700.jpg",
+            "w": 600,
+            "h": 400
+          },
+          {
+            "type": "file",
+            "name": "8a1a14ec0239.jpg",
+            "urn": "fffffffffff\\8a1a14ec0239.jpg",
+            "w": 1800,
+            "h": 1125
+          },
+          {
+            "type": "file",
+            "name": "tBWQ1Ta3rKI.jpg",
+            "urn": "fffffffffff\\tBWQ1Ta3rKI.jpg",
+            "w": 474,
+            "h": 604
+          }
+        ]
+      },
+      {
+        "type": "file",
+        "name": "infografika.png",
+        "urn": "infografika.png",
+        "w": 720,
+        "h": 2617
+      }
+    ],
+    "designScreenshotsFoldersUncollapsed": [
+      "ff"
+    ],
+    "designScreenshotsRelatedResolutionAndPage": {
+      "questor-it.ru/www/case-dostaevsky.html": {
+        "768|auto": [
+          {
+            "urn": "infografika.png",
+            "active": true,
+            "pos": "static",
+            "l": "center",
+            "t": "top",
+            "lpx": 10,
+            "tpx": 10,
+            "lper": 10,
+            "tper": 10
+          }
+        ],
+        "480|auto": [
+          {
+            "urn": "infografika.png",
+            "active": false,
+            "pos": "fixed",
+            "l": "center",
+            "t": "bottom",
+            "lpx": 0,
+            "tpx": 10,
+            "lper": 10,
+            "tper": 10
+          }
+        ]
+      }
+    }
+  },
+  "sessionGroupSynchronizations": [
+    {
+      "name": "664",
+      "synchroParams": [],
+      "data": {}
+    },
+    {
+      "name": "55",
+      "synchroParams": [],
+      "data": {}
+    },
+    {
+      "name": "Общая",
+      "synchroParams": [
+        "pages"
+      ],
+      "data": {
+        "pages": {
+          "currentPage": "reset.html"
+        }
+      }
+    },
+    {
+      "name": "664пп",
+      "synchroParams": [],
+      "data": {}
+    },
+    {
+      "name": "55gg",
+      "synchroParams": [],
+      "data": {}
+    },
+    {
+      "name": "11111111111",
+      "synchroParams": [],
+      "data": {}
+    }
+  ]
 }

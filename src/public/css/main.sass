@@ -7,6 +7,15 @@
     padding: 5px
     box-sizing: border-box
     z-index: 1
+
+.shab__main-menu-container >,
+.pmv__pages-window,
+.shab__main-menu-bottom-section,
+.pp__screenshots-files-menu-scrollwrap,
+.pp__resolutions-list-resolution-content,
+.pp__screenshot-content >,
+.pp__screenshots-menu-top-panel,
+.pp__resolutions-menu
     .btn
         border: none
         border-radius: 0
@@ -14,12 +23,18 @@
     .form-control
         border-radius: 0
 
+.pp__resolutions-screenshots-btn-size
+    border: none
+    border-radius: 0
+    box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.5)
+
 .shab__main-menu-bottom-section
     position: absolute
     left: 0
     bottom: 0
     right: 0
     padding: 5px
+    background-color: rgba(255,255,255,0.7)
 
 .shab__btn-open-groups-session
     .caret
@@ -74,8 +89,7 @@
     right: 0
     box-shadow: none
 
-.shab__session-groups-list .ui-sortable-placeholder
-    visibility: visible!important
+.shab__session-groups-list .placeholder
     margin-top: 5px
     outline: #4183C4 dashed 1px
 
@@ -122,8 +136,9 @@
         box-shadow: -1px 1px 5px rgba(0,0,0,0.3)
 
 .pmv
+
     &__select-page-open-list
-        margin-top: 50px
+        margin-top: 30px
         .caret
             margin-left: 2px
             border-left: 4px dashed
@@ -142,26 +157,17 @@
             bottom: 0
             //+16 ширина скролла
             width: 336px
-            box-shadow: 1px 0 5px 0 rgba(0,0,0,0.5)
+            box-shadow: 1px 0 5px 0 rgba(0,0,0,0.5), inset -16px 0 0 0 #ddd
             background-color: #fff
-            &.no-scrollbar
-                width: 320px
         &-top-menu
             position: absolute
             top: 0
             left: 0
-            right: 0
+            right: 16px
             height: 45px
             padding: 5px
             box-sizing: border-box
             border-bottom: 1px dashed #999
-        &-domain
-            position: absolute
-            left: 5px
-            top: 5px
-            right: 75px
-            &-input.form-control
-                width: 100%
         &-btn
             &-collapsed.btn
                 display: none
@@ -174,6 +180,18 @@
                 top: 0
                 left: 100%
                 padding-left: 5px
+            &-delete-nested.btn, &-delete.btn, &-edit.btn
+                display: none
+                position: absolute
+                top: 0
+                right: 0
+                box-shadow: none
+            &-delete-nested.btn
+                right: 66px
+            &-delete.btn
+                right: 44px
+            &-edit.btn
+                right: 22px
             &-drag.btn
                 display: none
                 position: absolute
@@ -184,8 +202,9 @@
             margin-top: 5px
             &-content
                 position: relative
-                &:hover > .pmv__pages-btn-drag
-                    display: block
+                &:hover
+                     > .pmv__pages-btn-drag,  > .pmv__pages-btn-delete, .pmv__pages-btn-edit
+                        display: block
         &-sortable
             padding: 5px
             ul
@@ -196,10 +215,10 @@
                 position: absolute
                 top: 45px
                 left: 0
-                right: 0
+                right: 16px
                 bottom: 0
                 .mCSB_outside+.mCSB_scrollTools
-                    right: 0
+                    right: -16px
                     background-color: #fff
             .placeholder
                 margin-top: 5px
@@ -214,16 +233,15 @@
     &__add-page-group
         position: absolute
         top: 0
-        left: 100%
-        width: 71px
-        padding-left: 5px
+        right: 0
+        padding: 5px
 
 .have-nested
     > * > .pmv__pages-btn
         &-page, &-group
             padding-left: 25px
     > * > .pmv__pages-btn-collapsed
-        display: inline-block
+            display: inline-block
     &.collapsed
         > * > .pmv__pages-btn-collapsed
             .glyphicon-minus
@@ -233,6 +251,20 @@
 
 .pmv__pages-btn-collapsed
     .glyphicon-plus
+        display: none
+
+.pmv__modal-urn, .pmv__modal-name
+    &-exists, &-empty
+        display: none
+.pmv__modal-empty
+    display: none
+
+#modal-pmv-add-page-href
+    .modal-body
+        padding-bottom: 0
+
+#shab__page-or-group-update
+    .shab__page-or-group__name
         display: none
 
 .pp__select-resolution
@@ -254,10 +286,6 @@
     top: 86px
     right: 5px
     z-index: 1
-
-.mnif
-    &__navigator-window
-        height: 110px
 
 #loading
     position: fixed
@@ -366,10 +394,380 @@
 /********************************************/
 /*Пиксель перфект*/
 /********************************************/
-#modal-pp-add-group .alert-input-error
+.mnif
+    &__navigator-window
+        height: 110px
+
+.pp__resolutions-menu
+    margin-top: 5px
+    border-top: 1px dashed #999
+
+.pp__resolutions-list
+    margin-top: 5px
+    &-item
+        margin-bottom: 5px
+        &-content
+            position: relative
+    .pp__resolution-name-btn
+        text-align: left
+        font-weight: bold
+        &-w, &-h
+            width: 36px
+            display: inline-block
+        &-w
+            margin-left: 10px
+            text-align: right
+    .pp__resolutions-open-screenshots-btn
+        position: absolute
+        right: 0
+        top: 0
+        box-shadow: 0 2px 2px -1px rgba(0,0,0,0.5)
+        width: 22px
+        height: 20px
+        font-size: 9px
+
+.pp__btn-open-screenshots
+    margin-top: 15px
+
+.pp__screenshots-menu-window
     display: none
-    margin-top: 20px
-    margin-bottom: 5px
+    position: absolute
+    left: 125px
+    top: 0
+    bottom: 0
+    width: 483px
+    box-shadow: inset -16px 0 0 0 #ddd
+    background-color: #fff
+    &.open
+        display: block
+
+.pp__screenshots-menu-top-panel
+    position: absolute
+    top: 0
+    left: 0
+    right: 16px
+    height: 45px
+    padding: 5px
+    box-sizing: border-box
+    border-bottom: 1px dashed #999
+
+.pp__screenshots-menu-scrollwrap
+    position: absolute
+    left: 0
+    right: 16px
+    top: 45px
+    bottom: 0
+    .mCSB_outside+.mCSB_scrollTools
+        right: -16px
+        background-color: #fff
+
+.pp__add-resolution-btn
+    position: absolute
+    top: 5px
+    right: 5px
+
+.pp__resolutions-screenshots-list
+    padding: 5px
+    .placeholder
+        margin-top: 5px
+        outline: 1px dashed #4183C4
+
+.pp__resolutions-list-resolution
+    .pp__resolutionforscreen-name-btn
+        width: 110px
+        margin-top: 5px
+        text-align: left
+        font-weight: bold
+        &-w, &-h
+            width: 36px
+            display: inline-block
+        &-w
+            margin-left: 10px
+            text-align: right
+    .pp__resolutions-drag-btn, .pp__resolutions-delete-btn
+        display: none
+        position: absolute
+        right: 0
+        top: 0
+        box-shadow: none
+        width: 22px
+        height: 20px
+    .pp__resolutions-delete-btn
+        right: 22px
+
+.pp__resolutions-list-resolution-content
+    position: relative
+    width: 110px
+    &:hover
+        .pp__resolutions-drag-btn, .pp__resolutions-delete-btn
+            display: block
+
+//скриншоты
+.pp__resolutions-list-screenshots
+    margin-top: 5px
+    margin-left: 30px
+    min-height: 5px
+    .btn
+        font-weight: bold
+        text-align: left
+        word-wrap: break-word
+        white-space: pre-wrap
+
+.pp__screenshot-name-btn
+    margin-top: 5px
+    &-w, &-h
+        display: inline-block
+        width: 36px
+    &-w
+        text-align: right
+    &.active
+        box-shadow: inset 2px 0 0 0 #000, 1px 1px 4px 0 rgba(0,0,0,0.5)
+
+.pp__resolutions-screenshots
+    &-btn-size.btn
+        margin: 0 -5px 0 5px
+        box-shadow: 0 -1px 0 0 #fff, 0 1px 0 0 #fff, -1px 0 0 0 #333
+        float: right
+        padding: 0 0 0 5px
+        background: #fff
+    &-delete-btn.btn, &-drag-btn.btn, &-btn-deviation.btn
+        display: none
+        position: absolute
+        right: 0
+        top: 0
+        box-shadow: none
+        width: 22px
+        height: 20px
+    &-drag-btn.btn
+        right: 22px
+    &-delete-btn.btn
+        right: 44px
+
+.pp__screenshot-content
+    position: relative
+    &:hover
+        .pp__resolutions-screenshots
+            &-delete-btn.btn, &-drag-btn.btn, &-btn-deviation.btn
+                display: block
+
+.pp__deviation
+    display: none
+    position: absolute
+    top: 15px
+    right: 117px
+    width: 264px
+    z-index: 1
+    &.open
+        display: block
+    .btn-group-table > .btn-group > .btn,
+    .pp__deviation-fixed-or-static.btn-group-vertical .btn
+        border-radius: 0
+        -webkit-box-shadow: none
+        box-shadow: none
+    .btn-group-table .btn-group ~ .btn-group .btn
+        border-top-width: 0
+    .btn-group-table .btn-group .btn ~ .btn
+        border-left-width: 0
+    .row-otklonenie
+        &-1, &-2
+            .ui-spinner
+                margin: 0
+                padding: 0
+                border: none
+                border-radius: 0
+            .ui-spinner-button
+                display: none
+            .ui-spinner-input
+                margin: 0
+
+.pp__deviation-static .btn-group ~ .btn-group .btn
+    border-style: dashed
+.sm-scrin .pp__deviation-relative
+    width: 100%
+.pp__deviation
+    &-fixed-or-static
+        width: 100%
+        .btn
+            text-align: center
+            font-weight: normal
+    .row-otklonenie-1,
+    .row-otklonenie-2
+        padding-top: 15px
+.pp__deviation-col
+    &-left
+        position: relative
+        padding-right: 8px
+    &-right
+        position: relative
+        padding-left: 7px
+.row-name-px-percent
+    .pp__deviation-col-left:after
+        content: ""
+        position: absolute
+        bottom: 0
+        right: -7px
+        width: 15px
+        border-bottom: 1px solid #999
+    .pp__deviation-col-left:before
+        content: ""
+        position: absolute
+        top: 100%
+        right: 0
+        height: 90px
+        border-right: 1px solid #999
+    p
+        margin-top: 15px
+        margin-bottom: 0
+        padding-bottom: 5px
+        text-align: center
+        font-weight: bold
+        border-bottom: 1px solid #999
+.pp__deviation .panel-body
+    padding: 15px
+
+/*Список файлов скриншотов*/
+.pp__screenshots-files
+    &-menu-scrollwrap
+        display: none
+        position: absolute
+        //125+336  +  147
+        left: 608px
+        top: 0
+        bottom: 0
+        width: 336px
+        box-shadow: inset -16px 0 0 0 #ddd
+        background-color: #fff
+        padding: 5px 21px 5px 5px
+        z-index: 1
+        &.open
+            display: block
+        .mCSB_outside+.mCSB_scrollTools
+            right: 0
+            background-color: #fff
+        &-shadow
+            display: none
+            position: absolute
+            left: 934px
+            top: 0
+            bottom: 0
+            width: 10px
+            box-shadow: 1px 0 5px 0 rgba(0,0,0,0.5)
+        &.open + &-shadow
+            display: block
+
+.pp
+    &__verstka-design
+        margin-top: 15px
+        .btn
+            padding-left: 0
+            padding-right: 0
+    &__screenshots
+        &-btn
+            &-collapsed.btn, &-add-screenshot.btn
+                display: none
+                position: absolute
+                top: 0
+                left: 0
+                width: 22px
+                height: 20px
+                box-shadow: none
+            &-add-screenshot.btn
+                left: auto
+                right: 0
+            &-file
+                //padding-right: 97px
+            &-size
+                &.btn
+                    margin: 0 -5px 0 5px
+                    //box-shadow: -1px 0 0 0 #333, 0 1px 0 0 #333, -1px 1px 0 0 #333
+                    box-shadow: 0 -1px 0 0 #fff, 0 1px 0 0 #fff, -1px 0 0 0 #333
+                    float: right
+                    padding: 0 0 0 5px
+                    background: #fff
+                &-w, &-h
+                    display: inline-block
+                    width: 36px
+                &-w
+                    text-align: right
+        &-item
+            z-index: 3
+            margin-top: 5px
+            width: 250px
+            &-content
+                position: relative
+                &:hover >
+                    .pp__screenshots-btn-add-screenshot.btn
+                        display: block
+        &-files-menu-scrollwrap
+            ul
+                width: 250px
+                ul
+                    margin-left: 30px
+            .placeholder
+                margin-top: 5px
+                outline: 1px dashed #4183C4
+            .btn
+                font-weight: bold
+                text-align: left
+                word-wrap: break-word
+                white-space: pre-wrap
+                &.active
+                    box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.5), inset 0 -2px 0 0 #c00
+
+.have-nested
+    > * > .pp__screenshots-btn
+        &-folder
+            padding-left: 25px
+    > * > .pp__screenshots-btn-collapsed
+        display: inline-block
+    &.collapsed
+        > * > .pp__screenshots-btn-collapsed
+            .glyphicon-minus
+                display: none
+            .glyphicon-plus
+                display: inline-block
+
+.pp__screenshots-btn-collapsed
+    .glyphicon-plus
+        display: none
+
+//Миниатюрка
+.pp__screenshot-thumbnail
+    &-scrollwrap
+        display: none
+        position: absolute
+        //125+336+336  +  147
+        left: 944px
+        top: 0
+        bottom: 0
+        width: 336px
+        box-shadow: inset -16px 0 0 0 #ddd
+        background: url("../js/mylib/pixel-perfect/img/fon-for-png.png")
+        z-index: 1
+        &.open
+            display: block
+        .mCSB_outside+.mCSB_scrollTools
+            right: 0
+            background-color: #fff
+        &-shadow
+            display: none
+            position: absolute
+            left: 1270px
+            top: 0
+            bottom: 0
+            width: 10px
+            box-shadow: 1px 0 5px 0 rgba(0,0,0,0.5)
+        &.open + &-shadow
+            display: block
+
+#pp__modal-add-resolution
+    .pp__modal-val
+        &-exists, &-not-digit
+            margin-bottom: 0
+            display: none
+
+.pp__modal-add-resolution-errors
+    margin-bottom: 0
 
 /*Для выподающего списка групп*/
 

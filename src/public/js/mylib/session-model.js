@@ -2,18 +2,17 @@
     var sessionModel = function(data, socket) {
         var ____ = this;
         ____.data = data;
-        ____.globalSession = ____.data.globalSession;
-        ____.sessionGroupSynchronizations = ____.data.sessionGroupSynchronizations;
+        ____.responseHandlers = {};
 
         /*********************************/
         /*Общая синхронизация*/
         /*********************************/
 
         /*Синхронизации сессий*/
-        this.menuJsonToGroupsSessionJson = function(listGroupsAndActiveParameters) {
+        this.onChangeSessionGroups = function(listGroupsAndActiveParameters) {
             var sessionGroupsForNames = {};
-            for(var key in ____.sessionGroupSynchronizations) {
-                var one = ____.sessionGroupSynchronizations[key];
+            for(var key in ____.data.sessionGroupSynchronizations) {
+                var one = ____.data.sessionGroupSynchronizations[key];
                 sessionGroupsForNames[one.name] = one;
             }
 
@@ -25,17 +24,62 @@
                     one.data = {};
                 }
             }
-            ____.sessionGroupSynchronizations = listGroupsAndActiveParameters;
-        }
+            ____.data.sessionGroupSynchronizations = listGroupsAndActiveParameters;
 
-        this.modifiedSessionGroupList = function() {
-            socket.emit('global.modified_session_group_list', ____.sessionGroupSynchronizations);
-        }
 
+
+            socket.emit('global.changeSessionGroups', listGroupsAndActiveParameters);
+        }
+        socket.on('global.changeSessionGroups', function(listGroupsAndActiveParameters) {
+            ____.data.sessionGroupSynchronizations = listGroupsAndActiveParameters;
+
+            ____.responseHandlers["onChangeSessionGroups"]();
+        });
+
+        this.onSessionActivatedParam = function(name, nameParam, activated) {
+            var sessionGroupsForNames = {};
+            for(var key in ____.data.sessionGroupSynchronizations) {
+                var one = ____.data.sessionGroupSynchronizations[key];
+                sessionGroupsForNames[one.name] = one;
+            }
+
+            if(activated) {
+                var haveParam = false;
+                for(var key in sessionGroupsForNames[name].synchroParams) {
+                    if(nameParam == sessionGroupsForNames[name].synchroParams[key]) {
+                        haveParam = true;
+                        break;
+                    }
+                    if(!haveParam) {
+                        sessionGroupsForNames[name].synchroParams.push(nameParam);
+                    }
+                }
+            } else {
+                for(var key in sessionGroupsForNames[name].synchroParams) {
+                    if(nameParam == sessionGroupsForNames[name].synchroParams[key]) {
+                        sessionGroupsForNames[name].synchroParams.splice(key, 1);
+                        break;
+                    }
+                }
+            }
+
+            socket.emit('global.sessionActivatedParam', {
+                name: name,
+                nameParam: nameParam,
+                activated: activated,
+                synchroParams: sessionGroupsForNames[name].synchroParams
+            });
+        }
+        socket.on('global.sessionActivatedParam', function(listGroupsAndActiveParameters) {
+            ____.data.sessionGroupSynchronizations = listGroupsAndActiveParameters;
+
+            ____.responseHandlers["onChangeSessionGroups"]();
+        });
+        
         /*Страницы*/
-        this.savePages = function() {
-            socket.emit('global.modified_pages', ____.globalSession.pages);
-        }
+        /*this.savePages = function() {
+            socket.emit('global.modified_pages', ____.data.globalSession.pages);
+        }*/
         /*Разрешения экрана*/
         /*Скриншоты*/
 
@@ -108,8 +152,61 @@
         }
 
         /*Синхронизации сессий*/
-        this.selectSessionGroup = function() {
-            socket.emit('local.select_session_group', ____.globalSession.pages);
+        this.onSessionActivatedGroup = function(name, activated) {
+            var sessionGroups = undefined;
+            if(____.data.sessionGroupSynchronizations.length) {
+                if(activated) {
+                    if($.cookie('adaptive_pixel_perfect_groups_session') !== undefined) {
+                        sessionGroups = $.secureEvalJSON($.cookie('adaptive_pixel_perfect_groups_session')).groups;
+                    } else {
+                        sessionGroups = [];
+                    }
+                    //Если данной группы нет то добавляем
+                    var haveGroup = false;
+                    for(var key in sessionGroups) {
+                        if(sessionGroups[key] === name) {
+                            haveGroup = true;
+                            break;
+                        }
+                    }
+                    if(!haveGroup) {
+                        sessionGroups.push(name);
+                    }
+                    //
+                    validate();
+                } else {
+                    if($.cookie('adaptive_pixel_perfect_groups_session') !== undefined) {
+                        sessionGroups = $.secureEvalJSON($.cookie('adaptive_pixel_perfect_groups_session')).groups;
+                        //Удаляем группу если есть
+                        for(var key in sessionGroups) {
+                            if(sessionGroups[key] === name) {
+                                sessionGroups.splice(key, 1);
+                                break;
+                            }
+                        }
+                        //
+                        validate();
+                    }
+                }
+            }
+
+            function validate() {
+                //список в обьект по именам групп сессий
+                var sessionGroupsForNames = {};
+                for(var key in ____.data.sessionGroupSynchronizations) {
+                    var one = ____.data.sessionGroupSynchronizations[key];
+                    sessionGroupsForNames[one.name] = one;
+                }
+
+                //Удаляем имена выбранных групп которых уже нету
+                sessionGroups.filter(function(item, i, arr) {
+                    return item in sessionGroupsForNames;
+                });
+                $.cookie('adaptive_pixel_perfect_groups_session', $.toJSON({"groups": sessionGroups}));
+                if(!sessionGroups.length) {
+                    $.removeCookie('adaptive_pixel_perfect_groups_session');
+                }
+            }
         }
 
         /*Страницы*/
@@ -143,6 +240,7 @@
         /*Разрешения экрана*/
         /*Айфрейм с вёрсткой*/
 
+        //Получить обьект страницы
         this.getPage = function(urn) {
             return (function recursion(el) {
 
@@ -158,27 +256,9 @@
                 }
 
                 return false;
-            })(____.globalSession.pages);
+            })(____.data.globalSession.designScreenshots);
         }
-
-            this.getCurrentPage = function() {
-                return (function recursion(el) {
-
-                    for(var i in el) {
-                        if(el[i].type == "page" && el[i].urn == ____.data.currentPage) {
-                            return el[i];
-                        } else if("sub" in el[i]) {
-                            var r = recursion(el[i].sub);
-                            if(r !== false) {
-                                return r;
-                            }
-                        }
-                    }
-
-                    return false;
-                })(____.data.pages);
-            }
-
+        //Получить обьект группы
         this.getGroup = function(name) {
             return (function recursion(el) {
 
@@ -194,77 +274,46 @@
                 }
 
                 return false;
-            })(____.data.pages);
+            })(____.data.globalSession.pages);
         }
+        //Получить коллекцию скриншотов привязанных к текущей странице и разрешению
+        this.getCurrentRelatedScreenshotsCollection = function() {
+            var localSession = ____.getLocalSessionParams();
 
-        this.addPage = function(urn) {
-            if(this.getPage(urn) === false) {
-                ____.globalSession.pages.shift({
-                    type: "page",
-                    urn: urn
-                });
-            }
-        }
+            //Проверка страницы
+            if(localSession && "pages" in localSession && localSession.pages.currentPage !== null) {
+                var currentPage = localSession.pages.currentPage;
 
-        this.addGroup = function(name) {
-            if(this.getPage(name) === false) {
-                ____.globalSession.pages.shift({
-                    type: "group",
-                    name: name
-                });
-            }
-        }
+                //Проверка разрешения
+                if("resolutions" in localSession && localSession.resolutions.currentResolution !== null) {
+                    var resolution = localSession.resolutions.currentResolution;
 
-        /*this.updatePage = function() {
-            socket.emit('session.save', ____.globalSession);
-        }*/
+                    var screenshots = ____.data.globalSession.designScreenshots,
+                        screenshotsRelated = ____.data.globalSession.designScreenshotsRelatedResolutionAndPage;
 
-        this.deletePage = function(urn, nestedDelete) {
-            return (function recursion(el) {
-
-                for(var i in el) {
-                    if(el[i].type == "page" && el[i].urn == urn) {
-                        //Удаляем
-                        var deletedPage = el.splice(i, 1);
-                        if(nestedDelete !== true && "sub" in deletedPage) {
-                            el.splice.apply(null, [i, 0].push(deletedPage.sub));
-                        }
-
-                        return true;
-                    } else if("sub" in el[i]) {
-                        var r = recursion(el[i].sub);
-                        if(r !== false) {
-                            return r;
-                        }
+                    //Проверка привязанных скриншотов
+                    if(currentPage in screenshotsRelated && (resolution.w+"|"+resolution.h) in  screenshotsRelated[currentPage]) {
+                        return screenshotsRelated[currentPage][resolution.w+"|"+resolution.h];
                     }
                 }
-
-                return false;
-            })(____.globalSession.pages);
+            }
+            return null;
         }
-
-        this.deleteGroup = function(name, nestedDelete) {
-            return (function recursion(el) {
-
-                for(var i in el) {
-                    if(el[i].type == "group" && el[i].name == name) {
-                        //Удаляем
-                        var deletedPage = el.splice(i, 1);
-                        if(nestedDelete !== true && "sub" in deletedPage) {
-                            el.splice.apply(null, [i, 0].push(deletedPage.sub));
-                        }
-
-                        return true;
-                    } else if("sub" in el[i]) {
-                        var r = recursion(el[i].sub);
-                        if(r !== false) {
-                            return r;
-                        }
+        //Получить скриншоты в виде обьекта {urn: obj}
+        this.getScreenshotsObjList = function() {
+            var screenshotsObjList = {};
+            (function recursion(arr) {
+                for (var i in arr) {
+                    var el = arr[i];
+                    if (el.type == "file") {
+                        screenshotsObjList[el.urn] = el;
+                    }
+                    if ("sub" in el) {
+                        recursion(el.sub);
                     }
                 }
-
-                return false;
-            })(____.globalSession.pages);
+            })(____.data.globalSession.designScreenshots);
+            return screenshotsObjList;
         }
     }
 

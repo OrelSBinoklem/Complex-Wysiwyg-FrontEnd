@@ -16,16 +16,17 @@ var gulp = require('gulp'),
     //concatCss = require('gulp-concat-css'),
     //through2 = require('through2').obj,
     changed = require('gulp-changed'),
-	mkdirp = require('mkdirp');
+	mkdirp = require('mkdirp'),
+    plumber = require('gulp-plumber');
 
 gulp.task('style', function () {
     gulp.src("src/public/**/*.sass") //Выберем наш main.scss
         .pipe(changed("public", {extension: '.css'}))
         .pipe(sourcemaps.init())
         .pipe(sass()) //Скомпилируем
-        .pipe(prefixer()) //Добавим вендорные префиксы
+        //.pipe(prefixer()) //Добавим вендорные префиксы
         .pipe(cssmin()) //Сожмем
-        .pipe(sourcemaps.write('.'))
+        .pipe(sourcemaps.write("."))
         .pipe(gulp.dest("public"));
 });
 
@@ -38,6 +39,7 @@ gulp.task('css', function () {
 
 gulp.task('js', function () {
     gulp.src("src/public/**/*.js")
+        .pipe(plumber())
         .pipe(changed("public"))
         .pipe(sourcemaps.init())
         .pipe(uglify()) //Сожмем наш js
