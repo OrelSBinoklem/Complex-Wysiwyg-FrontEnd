@@ -23,7 +23,7 @@ var customScrollIFrame = function($container, options) {
         $iFrame.find(' head').append('\n\
             <style id="csif-clear-scroll-body" type="text/css">\n\
                 body {\n\
-                    overflow: hidden;\n\
+                    overflow: hidden !important;\n\
                 }\n\
             </style>\n\
         ');
@@ -61,8 +61,7 @@ var customScrollIFrame = function($container, options) {
          ____.updateOuterScroll();
     }
     
-    this._destroy = function()
-    {
+    this._destroy = function() {
         var $iFrame = $('#'+(____._options.nameIFrame)).contents();
         
         $container.find(" .csif-outer-scroll-v").remove();
@@ -75,6 +74,13 @@ var customScrollIFrame = function($container, options) {
         $('body').off('mouseup', ____._handlerUp);
         $iFrame.find('body').off('mousemove', ____._handlerMove);
         $('body').off('mousemove', ____._handlerMove);
+
+        $container.find(' .csif-outer-scroll-v .arrow-top').off('mousedown', ____._handlerArrowTop);
+        $container.find(' .csif-outer-scroll-v .arrow-bottom').off('mousedown', ____._handlerArrowBottom);
+        $container.find(' .csif-outer-scroll-g .arrow-left').off('mousedown', ____._handlerArrowLeft);
+        $container.find(' .csif-outer-scroll-g .arrow-right').off('mousedown', ____._handlerArrowRight);
+        $container.find(' .csif-outer-scroll-v .arrow').off('mouseup mouseleave', ____._handlerArrowLeave);
+        $container.find(' .csif-outer-scroll-g .arrow').off('mouseup mouseleave', ____._handlerArrowLeave);
         
         $iFrame.find('body').off('wheel', ____._handlerMouseWheel);
     }
@@ -217,6 +223,7 @@ var customScrollIFrame = function($container, options) {
                     resTopScroll = hDocument - hWindow;
                 }
     			$(iframe.window).scrollTop(resTopScroll);
+                $container.trigger("csif.scroll");
             }
             
             if(____._X_Scrollable)
@@ -232,6 +239,7 @@ var customScrollIFrame = function($container, options) {
                     resLeftScroll = wDocument - wWindow;
                 }
     			$(iframe.window).scrollLeft(resLeftScroll);
+                $container.trigger("csif.scroll");
             }
         }
     }
@@ -250,9 +258,11 @@ var customScrollIFrame = function($container, options) {
             easing: "linear",
             complete: function(){
 				$(iframe.window).scrollTop(0);
+                $container.trigger("csif.scroll");
             },
             step: function(now,fx){
 				$(iframe.window).scrollTop(now);
+                $container.trigger("csif.scroll");
             }
         });
     }
@@ -276,9 +286,11 @@ var customScrollIFrame = function($container, options) {
             easing: "linear",
             complete: function(){
 				$(iframe.window).scrollTop(resTopScroll);
+                $container.trigger("csif.scroll");
             },
             step: function(now,fx){
 				$(iframe.window).scrollTop(now);
+                $container.trigger("csif.scroll");
             }
         });
     }
@@ -296,9 +308,11 @@ var customScrollIFrame = function($container, options) {
             easing: "linear",
             complete: function(){
 				$(iframe.window).scrollLeft(0);
+                $container.trigger("csif.scroll");
             },
             step: function(now,fx){
 				$(iframe.window).scrollLeft(now);
+                $container.trigger("csif.scroll");
             }
         });
     }
@@ -322,9 +336,11 @@ var customScrollIFrame = function($container, options) {
             easing: "linear",
             complete: function(){
 				$(iframe.window).scrollLeft(resLeftScroll);
+                $container.trigger("csif.scroll");
             },
             step: function(now,fx){
 				$(iframe.window).scrollLeft(now);
+                $container.trigger("csif.scroll");
             }
         });
     }
@@ -339,6 +355,7 @@ var customScrollIFrame = function($container, options) {
     this._mouseWheelAnimated = false;
     this._tempWheelAnimated = 0;
     this._handlerMouseWheel = function(e) {
+        if(window[____._options.nameIFrame] !== undefined) {
             var deltaY;
             if("mozMovementY" in e.originalEvent) {
                 deltaY = e.originalEvent.deltaY || -1 * e.originalEvent.wheelDelta;
@@ -349,8 +366,14 @@ var customScrollIFrame = function($container, options) {
                 } else {
                     deltaY = -120;
                 }
+            } else if( /Firefox\//.test(navigator.userAgent) ) {
+                deltaY = e.originalEvent.deltaY || -1 * e.originalEvent.wheelDelta;
+                deltaY *= 40;
             } else {
                 deltaY = e.originalEvent.deltaY || -1 * e.originalEvent.wheelDelta;
+                if(Math.abs(deltaY) < 50) {
+                    deltaY *= 120;
+                }
             }
 
             var iframe = window[____._options.nameIFrame];
@@ -386,40 +409,19 @@ var customScrollIFrame = function($container, options) {
                     complete: function(){
                         $(iframe.window).scrollTop(____._tempWheelAnimated);
                         ____._mouseWheelAnimated = false;
+
+                        $container.trigger("csif.scroll");
                     },
                     step: function(now,fx){
                         $(iframe.window).scrollTop(now);
+
+                        $container.trigger("csif.scroll");
                     }
                 });
+        }
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 modules.customScrollIFrame = customScrollIFrame;
     
-/*jQuery.fn.responsiveBlock = function(options){
-    options = $.extend({
-        defColor:"white",
-        hoverColor:"red"
-    }, options});
-
-    var make = function(){
-        
-    };
-
-    return this.each(make);*/
 })(jQuery);

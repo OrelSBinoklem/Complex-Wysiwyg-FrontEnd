@@ -1,4 +1,4 @@
-(function($){//Модули: getfile, setfile, .xml(), malihu-custom-scrollbar
+(function($){//Модули: malihu-custom-scrollbar
 
 var defaultOptions = {
     dirScrins: "design-screenshots",
@@ -39,59 +39,64 @@ var pixelPerfect = function($container, options) {
         }
         $container.find( " .pp-design" ).remove();
     }
-
-        this.setSizeIFrame = function( w, h ) {
-            var $fittingWrap = $("#"+(____._options.nameIFrame)).closest(".pmv-fitting-wrap");
-            $fittingWrap.stop().animate({width: w+'px', height: h+'px'}, 1000);
-        }
     
     this._refreshByScroll = function() {
         var $design = $container.find( " .pp-design" );
         var iframe = window[____._options.nameIFrame];
-        
-        $design.find( " .pp-screen-static" ).css({
-            top: "-" + Math.round( $(iframe.window).scrollTop() ) + "px",
-            left: "-" + Math.round( $(iframe.window).scrollLeft() ) + "px"
-        });
+
+        if(iframe !== undefined) {
+            $design.find( " .pp-screen-static" ).css({
+                top: "-" + Math.round( $(iframe.window).scrollTop() ) + "px",
+                left: "-" + Math.round( $(iframe.window).scrollLeft() ) + "px"
+            });
+        }
     }
     
     this._refreshByResizeDocument = function() {
-        var $design = $container.find( " .pp-design" );
         var iframe = window[____._options.nameIFrame];
-        
-        $design.find( " .pp-screen-static" ).css({
-            width: Math.round( $(iframe.document).width() )
-        });
+        if(iframe !== undefined) {
+            var $design = $container.find( " .pp-design" );
+
+            $design.find( " .pp-screen-static" ).css({
+                width: Math.round( $(iframe.document).width() )
+            });
+        }
     }
     
     this.refreshScrins = function(collectionScrins, sizeScrins) {
-        var scrinsModified = false;
-        var scrinsChangePos = false;
-        if(!("collectionScrinsTemp" in ____)) {
-            scrinsModified = true;
-        } else if(____.collectionScrinsTemp.length != collectionScrins.length) {
-            scrinsModified = true;
-        } else {
-            for(var i in ____.collectionScrinsTemp) {
-                var a = ____.collectionScrinsTemp[i];
-                var b = collectionScrins[i];
-                if(a.urn !== b.urn || a.active !== b.active) {
-                    scrinsModified = true;
-                    break;
-                } else if(a.pos !== b.pos || a.l !== b.l || a.t !== b.t || a.lpx !== b.lpx || a.tpx !== b.tpx || a.lper !== b.lper || a.tper !== b.tper) {
-                    scrinsChangePos = true;
+        if(collectionScrins !== null) {
+            var scrinsModified = false;
+            var scrinsChangePos = false;
+            if(!("collectionScrinsTemp" in ____)) {
+                scrinsModified = true;
+            } else if(typeof ____.collectionScrinsTemp !== typeof collectionScrins) {//null или обьект
+                scrinsModified = true;
+            } else if(____.collectionScrinsTemp.length != collectionScrins.length) {
+                scrinsModified = true;
+            } else {
+                for(var i in ____.collectionScrinsTemp) {
+                    var a = ____.collectionScrinsTemp[i];
+                    var b = collectionScrins[i];
+                    if(a.urn !== b.urn || a.active !== b.active) {
+                        scrinsModified = true;
+                        break;
+                    } else if(a.pos !== b.pos || a.l !== b.l || a.t !== b.t || a.lpx !== b.lpx || a.tpx !== b.tpx || a.lper !== b.lper || a.tper !== b.tper) {
+                        scrinsChangePos = true;
+                    }
                 }
             }
-        }
 
-        if(scrinsModified) {
-            ____.refreshAllScrins(collectionScrins, sizeScrins);
-        } else if(scrinsChangePos) {
-            ____.refreshPosScrins(collectionScrins);
-        }
+            if(scrinsModified) {
+                ____.refreshAllScrins(collectionScrins, sizeScrins);
+            } else if(scrinsChangePos) {
+                ____.refreshPosScrins(collectionScrins);
+            }
 
-        ____._refreshByScroll();
-        ____._refreshByResizeDocument();
+            ____._refreshByScroll();
+            ____._refreshByResizeDocument();
+        } else {
+            ____._deleteScrins();
+        }
     }
 
     this._deleteScrins = function() {
@@ -108,11 +113,8 @@ var pixelPerfect = function($container, options) {
         for(var i in collectionScrins) {
             var s = collectionScrins[i];
             //сохраним изменения
-            var newObj = {}
+            var newObj = {};
             ____.collectionScrinsTemp.push(newObj);
-            for(var key in s) {
-                newObj[key] = s[key];
-            }
             //
 
             if(s.active) {
@@ -188,7 +190,7 @@ var pixelPerfect = function($container, options) {
                             }
                         }
                         $(this).find(" .pp-wrap-deviation-percent").css({left: (b.lper + l) + "%", top: (b.tper + t) + "%"});
-                        $(this).find(" .pp-wrap-deviation-pixels").css({left: s.lpx, top: s.tpx});
+                        $(this).find(" .pp-wrap-deviation-pixels").css({left: b.lpx, top: b.tpx});
                         $(this).find(" img").css({left: l_img + "%", top: t_img + "%"});
                     } else {
                         continue;

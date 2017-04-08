@@ -37,8 +37,7 @@ var resizeIFrame = function($container, options) {
         
     }
     
-    this._destroy = function()
-    {
+    this._destroy = function() {
         var $iFrame = $("#"+(____._options.nameIFrame)).contents();
         
         $container.find(" .rif-show-dimensions").remove();
@@ -54,19 +53,17 @@ var resizeIFrame = function($container, options) {
         $(window[____._options.nameIFrame].window).off('resize', ____._handlerResize);
     }
     
-    this.reload = function()
-    {
+    this.reload = function() {
         ____._destroy();
         ____._create();
     }
     
     //Нажатие на комбинацию клавиш
-    this._handlerDown = function(e)
-    {
+    this._handlerDown = function(e) {
         if(e.which == 82 && e.ctrlKey && !e.shiftKey && !e.altKey)
         {
             if(!____._resize) {
-                $container.trigger( "rif.start.resize" );
+                $container.trigger("rifStartResize");
                 //Фиксация в пикселах (чтоб меньше багов при расчётах было) и центрирование
                 var $rif = $container.find(" .rif-show-dimensions");
                 $rif
@@ -91,37 +88,30 @@ var resizeIFrame = function($container, options) {
                 ____._reloadShowDimensions();
             }
                 
-            if(e.preventDefault){ e.preventDefault()}
-  		    else{e.stop()};
-    		e.returnValue = false;
-    		e.stopPropagation();
-            return false;
+            if(e.preventDefault){ e.preventDefault()} else{e.stop()};e.returnValue = false;e.stopPropagation();return false;
         }
     }
     
     //Отпускание клавиш
-    this._handlerUp = function(e)
-    {
+    this._handlerUp = function(e) {
         if( ____._resize ) {
             var $mnif = $container.find(" .rif-show-dimensions");
             $mnif.css({display: "none"});
             
             ____._resize = false;
             
-            $container.trigger( "rif.stop.resize" );
+            $container.trigger("rifStopResize");
         }
     }
     
-    this._handlerResize = function()
-    {
+    this._handlerResize = function() {
         ____._centerIFrameAndNoEmptySpace();
         ____._reloadShowDimensions();
     }
     
     //Центрирование iFrame при ресайзе если он меньше контейнера, а также если рамер iFrame больше чем размер контенера то правый край лепим к правому и нижний к нижнему чтобы небыло пустого пространства
     //нужно для нормальной работы "map-navigator-iframe"
-    this._centerIFrameAndNoEmptySpace = function()
-    {
+    this._centerIFrameAndNoEmptySpace = function() {
         var $iframe = $("#"+(____._options.nameIFrame));
         var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
         var $outerWrap = $iframe.closest(".pmv-outer-wrap");
@@ -158,8 +148,7 @@ var resizeIFrame = function($container, options) {
     }
     
     //Обновление показывателя текущих размеров
-    this._reloadShowDimensions = function()
-    {
+    this._reloadShowDimensions = function() {
         var $fittingWrap = $("#"+(____._options.nameIFrame)).closest(".pmv-fitting-wrap");
         var w =   $fittingWrap.width();
         var h =   $fittingWrap.height();
@@ -169,8 +158,7 @@ var resizeIFrame = function($container, options) {
     }
     
     //Обновление размеров IFrame
-    this._handlerMove = function(e)
-    {
+    this._handlerMove = function(e) {
         ____._last_cursor_X = e.screenX;
         ____._last_cursor_Y = e.screenY;
         
@@ -198,8 +186,11 @@ var resizeIFrame = function($container, options) {
             
             $fittingWrap.css({
                 width: Math.round( w ),
-                height: Math.round( h )
+                height: Math.round( h ),
+                maxHeight: ""
             });
+
+            $container.trigger("rifResize");
         }
     }
 }

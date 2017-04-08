@@ -1,23 +1,16 @@
 /****************************************************/
 /*Шаблонизатор*/
 /****************************************************/
+var crossModulesFunctions = {};
 jQuery(function($) {
-    $("body").on('keydown', function(e) {
-        if(e.which == 49 && e.altKey)//(e.which == 65 || e.which == 83 || e.which == 68)
-        {
-            e = e || window.e; if (e.stopPropagation) {e.stopPropagation()} else {e.cancelBubble = true} e.preventDefault();
-        }
-    });
-
     var session;
     var socket = io.connect('/');
 
     socket.once('session.load', function (data) {
         session = new modules.sessionModel(data, socket);
-        //console.log(data);
         next();
     });
-
+    
     function next() {
         //Глобальные настройки
         (function() {
@@ -273,26 +266,74 @@ jQuery(function($) {
             //Запись и отправка данных сессии
             function sendSessionSortableGroups() {
                 session.onChangeSessionGroups(groupsSessionToJson($('.shab__session-groups-list')));
+                applyAllParamsLocalSession(true);
             }
             function sendSessionAddGroup() {
                 session.onChangeSessionGroups(groupsSessionToJson($('.shab__session-groups-list')));
+                applyAllParamsLocalSession(true);
             }
             function sendSessionDeleteGroup() {
                 session.onChangeSessionGroups(groupsSessionToJson($('.shab__session-groups-list')));
+                applyAllParamsLocalSession(true);
             }
             function sendSessionActivatedGroup(name, activated) {
                 session.onSessionActivatedGroup(name, activated);
+                applyAllParamsLocalSession(true);
             }
             function sendSessionActivatedParam(name, nameParam, activated) {
                 session.onSessionActivatedParam(name, nameParam, activated);
+                applyAllParamsLocalSession(true);
             }
 
             //Приём данных сессии
             session.responseHandlers["onChangeSessionGroups"] = function() {
                 refreshMenuView();
+                applyAllParamsLocalSession(true);
             }
-            session.responseHandlers["onSessionActivatedParam"] = function() {
-                refreshMenuView();
+            session.responseHandlers["onSessionActivatedParam"] = function(name, nameParam, activated) {
+                $(".shab__session-groups-list-ul [data-name='"+name+"'] [data-param='"+nameParam+"']").toggleClass("active", activated);
+                applyAllParamsLocalSession(true);
+            }
+
+            //Применение новой локальной сессии
+            crossModulesFunctions["session.applyAllParamsLocalSession"] = function(onlyChange) {
+                //Получаем сессию без куков потому что м в куках и так будет записано текущее состояние сессии
+                var ls = session.getLocalSessionParams(onlyChange);
+                //console.log(ls);
+                //Страница
+                if( ls && "pages" in ls && "currentPage" in ls.pages && (!onlyChange || ls.pages.currentPage !== pageManagerVisualizator.currentPage) ) {
+                    pageManagerVisualizator.$container.one("pmv.load.iframe", pageLoaded);
+                    pageManagerVisualizator.selectPage(ls.pages.currentPage);
+                } else {
+                    pageLoaded();
+                }
+                function pageLoaded() {
+                    //Разрешение
+                    if( ls && "iframe" in ls && "size" in ls.iframe ) {
+                        pageManagerVisualizator.setSizeIFrame(ls.iframe.size.w, ls.iframe.size.h, true);
+                    } else if(ls && "resolutions" in ls && "currentResolution" in ls.resolutions) {
+                        pageManagerVisualizator.setSizeIFrame(ls.resolutions.currentResolution.w, ls.resolutions.currentResolution.h, true);
+                    }
+                    var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                    pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+                    if(ls && "resolutions" in ls && "showPageProofsOrDesign" in ls.resolutions) {
+                        pixelPerfect.showPageProofsOrDesign(ls.resolutions.showPageProofsOrDesign);
+                        crossModulesFunctions["pp.refreshButtonsPageProofsOrDesign"](ls.resolutions.showPageProofsOrDesign);
+                    }
+                    //iFrame
+                    if( ls && "iframe" in ls && "size" in ls.iframe ) {
+                        pageManagerVisualizator.setSizeIFrame(ls.iframe.size.w, ls.iframe.size.h, true);
+                    }
+                    if( ls && "iframe" in ls && "position" in ls.iframe ) {
+                        pageManagerVisualizator.setPositionIFrame(ls.iframe.position.left, ls.iframe.position.top);
+                    }
+                    if( ls && "iframe" in ls && "scroll" in ls.iframe ) {
+                        pageManagerVisualizator.setScrollIFrame(ls.iframe.scroll.left, ls.iframe.scroll.top);
+                    }
+                }
+            }
+            function applyAllParamsLocalSession(onlyChange) {
+                crossModulesFunctions["session.applyAllParamsLocalSession"](onlyChange);
             }
         })();
 
@@ -313,9 +354,16 @@ jQuery(function($) {
                 responsiveToMovementOfTheCursorInAConfinedSpace: true,
                 movementOfTheCursorInAConfinedSpaceSpred: 10,
                 gorizontalFixation: "center",
-                verticalFixation: "top"
+                verticalFixation: "top",
+                minHeightCalculateAuto: 480,
+                heightCalculateRatio: 16/9,
+                calculatedHeightAsMaxHeight: true,
+                stopAllAnimationsAtResize: true
             });
 
+            /****************************************************/
+            /*Страницы*/
+            /****************************************************/
             //Скроллбар для списка страниц
             $(".pmv__pages-sortable-scrollwrap").mCustomScrollbar({
                 axis: "y",
@@ -342,18 +390,11 @@ jQuery(function($) {
             $('.pmv__pages-sortable').on('click', ' .pmv__pages-btn-page', function() {
                 $(".pmv__pages-btn-page").removeClass("active");
                 $(this).addClass("active");
-                pageManagerVisualizator.handlerSelectPage( $(this).closest(".pmv__pages-item").attr("data-name") );
+                pageManagerVisualizator.selectPage( $(this).closest(".pmv__pages-item").attr("data-name") );
                 if( $(".pmv__select-page-open-list").hasClass('active') ) {
                     $(".pmv__select-page-open-list").removeClass('active');
                 }
-            });
-            $("body").on("pmv.user.changepage", function(){
-                session.changePage(pageManagerVisualizator.currentPage);
-            });
-            $("body").on("synchro.changed_page", function(e, page){
-                $(".pmv__pages-btn-page").removeClass("active");
-                $(".pmv__pages-item[data-name='"+page+"'] > * > .pmv__pages-btn-page").addClass("active");
-                session.selectPage(page);
+                sendSelectPage();
             });
 
             //Добавляем страницу
@@ -381,6 +422,8 @@ jQuery(function($) {
                 function next() {
                     $(".pmv__pages-sortable > ul").prepend( createMenuItem("page", $.trim(urn)) );
                     $('#modal-pmv-add-page-href .modal').modal('hide');
+
+                    sendAddPage();
                 }
             });
             $('.pmv__add-page').on('click', function(){
@@ -425,6 +468,8 @@ jQuery(function($) {
                 function next() {
                     $(".pmv__pages-sortable > ul").prepend( createMenuItem("group", $.trim(name)) );
                     $('#pmv__modal-add-group .modal').modal('hide');
+
+                    sendAddPageGroup();
                 }
             });
             $('.pmv__add-group').on('click', function(){
@@ -464,6 +509,8 @@ jQuery(function($) {
                 clearCollapseNotNested($main);
 
                 $('#shab__page-or-group-delete .modal').modal('hide');
+
+                sendDeletePageOrGroup();
             });
             $('#shab__page-or-group-delete .shab__page-or-group-delete-nested-btn').on('click', function(){
                 var name = $('#shab__page-or-group-delete .shab__page-or-group__name').attr("data-name");
@@ -475,6 +522,8 @@ jQuery(function($) {
                 clearCollapseNotNested($main);
 
                 $('#shab__page-or-group-delete .modal').modal('hide');
+
+                sendDeletePageOrGroup();
             });
 
             //Обновляем страницу или группу
@@ -526,15 +575,83 @@ jQuery(function($) {
                     }
                 }
 
-                //Добавляем страницу
+                //Обновляем страницу
                 function next() {
-                    $(".pmv__pages-sortable .pmv__pages-item[data-type='"+type+"'][data-name='"+name+"']")
-                        .attr("data-name", newName)
+                    var $li = $(".pmv__pages-sortable .pmv__pages-item[data-type='"+type+"'][data-name='"+name+"']")
+                    $li.attr("data-name", newName)
                         .find(" > * > .pmv__pages-btn-name").text(newName);
 
                     $('#shab__page-or-group-update .modal').modal('hide');
+
+                    if(type == "page") {
+                        if($li.find(" .pmv__pages-btn-page").hasClass("active")) {
+                            pageManagerVisualizator.selectPage( newName );
+                            sendUpdatePageOrGroup();
+                            sendSelectPage();
+                        } else {
+                            sendUpdatePageOrGroup();
+                        }
+                    } else {
+                        sendUpdatePageOrGroup();
+                    }
                 }
             });
+
+            //Коллапсируем-расколлапсируем пункты с вложенными пунктами
+            $(".pmv__pages-sortable").on("click", " .pmv__pages-btn-collapsed", function(){
+                var $item = $(this).closest(".pmv__pages-item");
+                if( $item.hasClass("collapsed") ) {
+                    $item.removeClass("collapsed")
+                        .find(" > ul").css({display: "block"});
+                } else {
+                    $item.addClass("collapsed")
+                        .find(" > ul").css({display: "none"});
+                }
+
+                sendCollapseUncollapsePageOrGroup();
+            });
+
+            //Запись и отправка данных сессии
+            function sendSelectPage() {
+                session.onSelectPage(pageManagerVisualizator.currentPage);
+            }
+            function sendAddPage() {
+                session.onChangePages(pagesNestedToJson($('.pmv__pages-sortable')));
+            }
+            function sendAddPageGroup() {
+                session.onChangePages(pagesNestedToJson($('.pmv__pages-sortable')));
+            }
+            function sendDeletePageOrGroup() {
+                session.onChangePages(pagesNestedToJson($('.pmv__pages-sortable')));
+            }
+            function sendUpdatePageOrGroup() {
+                //обновить нетолько меню но и страницу которую мозможно модифицировали
+                session.onUpdatePageOrGroup(pagesNestedToJson($('.pmv__pages-sortable')));
+            }
+            function sendSortablePageOrGroup() {
+                session.onChangePages(pagesNestedToJson($('.pmv__pages-sortable')));
+            }
+            function sendCollapseUncollapsePageOrGroup() {
+                session.onChangePages(pagesNestedToJson($('.pmv__pages-sortable')));
+            }
+
+            //Приём данных сессии
+            session.responseHandlers["onSelectPage"] = function(o) {
+                //Получаем сессию без куков потому что м в куках и так будет записано текущее состояние сессии
+                var ls = session.getLocalSessionParams(true);
+                //Страница
+                if( ls && "pages" in ls && "currentPage" in ls.pages && (ls.pages.currentPage !== pageManagerVisualizator.currentPage && true) ) {
+                    $(".pmv__pages-btn-page").removeClass("active");
+                    $(".pmv__pages-item[data-name='"+(ls.pages.currentPage)+"'] > * > .pmv__pages-btn-page").addClass("active");
+                    pageManagerVisualizator.selectPage(ls.pages.currentPage);
+                }
+            }
+            session.responseHandlers["onChangePages"] = function(o) {
+                refreshMenuPages();
+            }
+            session.responseHandlers["onUpdatePageOrGroup"] = function(o) {
+                refreshMenuPages();
+            }
 
             //Генерируем пункт меню
             function createMenuItem(type, name) {
@@ -576,15 +693,13 @@ jQuery(function($) {
                     clearEmptyUl($main);
                     refreshNestedEl($main);
                     clearCollapseNotNested($main);
-                    session.data.pages = pagesNestedToJson($main);
-                    session.savePages();
+                    sendSortablePageOrGroup();
                 }
             });
 
-            pageManagerVisualizator.$container.on("pmv.change.pagelist", refreshMenuView);
-            refreshMenuView();
-            
-            function refreshMenuView() {
+            refreshMenuPages();
+
+            function refreshMenuPages() {
                 var localSession = session.getLocalSessionParams();
                 dragItemList = false;
                 var $main = $(".pmv__pages-sortable-ul");
@@ -623,17 +738,6 @@ jQuery(function($) {
                 refreshNestedEl($(".pmv__pages-sortable"));
                 refreshCollapsed($(".pmv__pages-sortable"));
             }
-
-            $(".pmv__pages-sortable").on("click", " .pmv__pages-btn-collapsed", function(){
-                var $item = $(this).closest(".pmv__pages-item");
-                if( $item.hasClass("collapsed") ) {
-                    $item.removeClass("collapsed")
-                        .find(" > ul").css({display: "block"});
-                } else {
-                    $item.addClass("collapsed")
-                        .find(" > ul").css({display: "none"});
-                }
-            });
 
             //Парсинг страниц в json обьект
             function pagesNestedToJson($main) {
@@ -705,6 +809,322 @@ jQuery(function($) {
                 $main.find(" .pmv__pages-item > ul").not($main.find(" .pmv__pages-item.collapsed > ul")).css({display: "block"});
             }
 
+            /****************************************************/
+            /*Разрешения*/
+            /****************************************************/
+            //Добавляем разрешение
+            $('#pp__modal-add-resolution .btn-select').on('click', function(event){
+                var hasError = false;
+                var w = $.trim($('#pp__modal-add-resolution .pp__modal-add-resolution-w').val());
+                var h = $.trim($('#pp__modal-add-resolution .pp__modal-add-resolution-h').val());
+
+                //Проверяем на ошибки
+                if(!(/^[1-9]\w{2,4}$/gim.test(w) && parseInt(w) >= 320 && parseInt(w) <= 99999)) {
+                    hasError = true;
+                    $('#pp__modal-add-resolution .pp__modal-add-resolution-w-group').addClass("has-error");
+                    $('#pp__modal-add-resolution .pp__modal-val-not-digit').css({display: "block"});
+                }
+                if(!(h == "auto" || (/^[1-9]\w{2,4}$/gim.test(h) && parseInt(h) >= 320 && parseInt(h) <= 99999))) {
+                    hasError = true;
+                    $('#pp__modal-add-resolution .pp__modal-add-resolution-h-group').addClass("has-error");
+                    $('#pp__modal-add-resolution .pp__modal-val-not-digit').css({display: "block"});
+                }
+                if(!hasError) {
+                    for(var i in session.data.globalSession.resolutions) {
+                        var one = session.data.globalSession.resolutions[i];
+                        if(parseInt(w) === one.w && (h === "auto" || parseInt(h) === one.h)) {
+                            hasError = true;
+                            $('#pp__modal-add-resolution .pp__modal-add-resolution-w-group').addClass("has-error");
+                            $('#pp__modal-add-resolution .pp__modal-add-resolution-h-group').addClass("has-error");
+                            $('#pp__modal-add-resolution .pp__modal-val-exists').css({display: "block"});
+                            break;
+                        }
+                    }
+                }
+
+                //Добавляем страницу
+                if(!hasError) {
+                    var html =
+                        "<li class='pp__resolutions-list-resolution' data-w='"+w+"' data-h='"+h+"'>" +
+                        '<div class="pp__resolutions-list-resolution-content">' +
+                        '<button class="btn btn-default btn-xs btn-block pp__resolutionforscreen-name-btn">' +
+                        '<span class="pp__resolutionforscreen-name-btn-w">'+w+'</span> | <span class="pp__resolutionforscreen-name-btn-h">'+h+'</span>' +
+                        '</button>' +
+                        '<button class="btn btn-default btn-xs pp__resolutions-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
+                        '<div class="btn btn-default btn-xs pp__resolutions-drag-btn"><span class="glyphicon glyphicon-move"></span></div>' +
+                        '</div>' +
+                        '<ul class="pp__resolutions-list-screenshots"></ul>' +
+                        '</li>';
+
+                    $(".pp__resolutions-screenshots-list").prepend(html);
+
+                    $('#pp__modal-add-resolution .modal').modal('hide');
+
+                    sendAddResolution();
+                }
+            });
+            $('.pp__add-resolution-btn').on('click', function(){
+                $('#pp__modal-add-resolution .pp__modal-val-exists').css({display: ""});
+                $('#pp__modal-add-resolution .pp__modal-val-not-digit').css({display: ""});
+                $('#pp__modal-add-resolution .pp__modal-add-resolution-w-group').removeClass("has-error");
+                $('#pp__modal-add-resolution .pp__modal-add-resolution-h-group').removeClass("has-error");
+
+                $('#pp__modal-add-resolution .modal').modal('show');
+            });
+
+            //Удаляем разрешение
+            $('.pp__screenshots-menu').on('click', " .pp__resolutions-delete-btn", function(){
+                var w = $(this).closest(".pp__resolutions-list-resolution").attr("data-w");
+                var h = $(this).closest(".pp__resolutions-list-resolution").attr("data-h");
+                $('#pp__modal-delete-resolution .pp__modal-delete-resolution-w')
+                    .attr("data-w", w)
+                    .text(w);
+                $('#pp__modal-delete-resolution .pp__modal-delete-resolution-h')
+                    .attr("data-h", h)
+                    .text(h);
+                $('#pp__modal-delete-resolution .modal').modal('show');
+            });
+            $('#pp__modal-delete-resolution .btn-select').on('click', function(){
+                var w = $('#pp__modal-delete-resolution .pp__modal-delete-resolution-w').attr("data-w");
+                var h = $('#pp__modal-delete-resolution .pp__modal-delete-resolution-h').attr("data-h");
+
+                $('.pp__screenshots-menu .pp__resolutions-list-resolution[data-w="'+w+'"][data-h="'+h+'"]').remove();
+
+                $('#pp__modal-delete-resolution .modal').modal('hide');
+
+                sendDeleteResolution();
+            });
+
+            //Выбор разрешения
+            $(".pp__resolutions-menu").on("click", " .pp__resolution-name-btn", function(){
+                var $li = $(this).closest(".pp__resolutions-list-item");
+
+                var w = $li.attr("data-w");
+                var h = $li.attr("data-h");
+
+                $(".pp__resolutions-list-item, .pp__resolution-name-btn, .pp__resolutionforscreen-name-btn").removeClass("active");
+                $(".pp__resolutions-list-item[data-w='"+(w)+"'][data-h='"+(h)+"']")
+                    .addClass("active")
+                    .find(" .pp__resolution-name-btn")
+                    .addClass("active");
+                $(".pp__resolutions-list-resolution[data-w='"+(w)+"'][data-h='"+(h)+"'] .pp__resolutionforscreen-name-btn").addClass("active");
+
+                sendSelectResolution(w, h);
+
+                pageManagerVisualizator.setSizeIFrame(w, h);
+            });
+
+            //Запись и отправка данных сессии
+            function sendAddResolution() {
+                session.onChangeResolutions(resolutionsToJson());
+                refreshMenuResolutions();
+            }
+
+            function sendDeleteResolution() {
+                session.onChangeResolutions(resolutionsToJson());
+                refreshMenuResolutions();
+
+                //обновить скриншоты
+                //crossModulesFunctions["pmv.refreshMenuViewScreenshotsForResolutions"]();
+
+                session.onChangeScreenshots(crossModulesFunctions["pp.allScreenshotsForCurPageToJson"]());
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendSelectResolution(w, h) {
+                session.onSelectResolution({
+                    w: parseInt(w),
+                    h: (h != "auto")?parseInt(h):h
+                });
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            crossModulesFunctions["pmv.sendSortableResolutions"] = function() {
+                session.onChangeResolutions(resolutionsToJson());
+                refreshMenuResolutions();
+                //
+                crossModulesFunctions["pmv.refreshMenuViewScreenshotsForResolutions"]();
+            }
+
+            //Приём данных сессии
+            session.responseHandlers["onChangeResolutions"] = function(o) {
+                refreshMenuResolutions();
+                //
+                crossModulesFunctions["pmv.refreshMenuViewScreenshotsForResolutions"]();
+            }
+            session.responseHandlers["onSelectResolution"] = function(o) {
+                //Получаем сессию без куков потому что м в куках и так будет записано текущее состояние сессии
+                var ls = session.getLocalSessionParams(true);
+                //Разрешение
+                if(ls && "resolutions" in ls && "currentResolution" in ls.resolutions) {
+                    $(".pp__resolutions-list-item, .pp__resolution-name-btn, .pp__resolutionforscreen-name-btn").removeClass("active");
+                    $(".pp__resolutions-list-item[data-w='"+(o.val.w)+"'][data-h='"+(o.val.h)+"']")
+                        .addClass("active")
+                        .find(" .pp__resolution-name-btn")
+                        .addClass("active");
+                    $(".pp__resolutions-list-resolution[data-w='"+(o.val.w)+"'][data-h='"+(o.val.h)+"'] .pp__resolutionforscreen-name-btn").addClass("active");
+
+                    pageManagerVisualizator.setSizeIFrame(ls.resolutions.currentResolution.w, ls.resolutions.currentResolution.h);
+                }
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+
+            function resolutionsToJson() {
+                var resolutions = [];
+
+                $(".pp__screenshots-menu-window .pp__resolutions-list-resolution").each(function() {
+                    resolutions.push({
+                        w: parseInt($(this).attr("data-w")),
+                        h: ($(this).attr("data-h") != "auto")?parseInt($(this).attr("data-h")):"auto"
+                    });
+                });
+
+                return resolutions;
+            }
+
+            refreshMenuResolutions();
+            function refreshMenuResolutions() {
+                var localSession = session.getLocalSessionParams();
+                //dragItemList = false;
+                var $main = $(".pp__resolutions-list");
+                $main.empty();
+
+                if(localSession && "pages" in localSession && localSession.pages.currentPage !== null) {
+                    var res = (function recursion(resolutions, html) {
+                        for(var i in resolutions) {
+                            var one = resolutions[i];
+                            var w = one.w;
+                            var h = one.h;
+                            var active = (localSession && "resolutions" in localSession && localSession.resolutions.currentResolution.w === w && localSession.resolutions.currentResolution.h === h)?"active":"";
+                            html += "<li class='pp__resolutions-list-item' data-w='"+w+"' data-h='"+h+"'>";
+                            html += '<div class="pp__resolutions-list-item-content">' +
+                                '<button class="btn btn-default btn-xs btn-block pp__resolution-name-btn '+active+'">' +
+                                '<span class="pp__resolution-name-btn-w">'+w+'</span> | <span class="pp__resolution-name-btn-h">'+h+'</span>' +
+                                '</button>' +
+                                '</div>';
+
+                            html += "</li>";
+                        }
+
+                        return html;
+                    })(session.data.globalSession.resolutions, "");
+
+                    $main.append(res);
+                }
+            }
+
+            /****************************************************/
+            /*Айфрейм*/
+            /****************************************************/
+            //Скролл
+            pageManagerVisualizator.$container.on("csif.scroll", sendScrollIFrame);
+            pageManagerVisualizator.$container.on("fcar.scroll", sendScrollIFrame);
+
+            //Смена позиции окна Айфрейма
+            pageManagerVisualizator.$container.on("mnif.changePos", sendChangePosIFrame);
+
+            //Ресайз Айфрейма
+            var resizeIFrame__timeoutId = null;
+            var curSizeIFrame = null;
+            var lastSizeIFrame = null;
+            pageManagerVisualizator.$container.on("rifStartResize", function() {
+                sendResizeIFrame();
+                resizeIFrame__timeoutId = setInterval(function() {
+                    if(curSizeIFrame !== null && (lastSizeIFrame.w !== curSizeIFrame.w || lastSizeIFrame.h !== curSizeIFrame.h)) {
+                        sendResizeIFrame();
+                    }
+                }, 500);
+            });
+            pageManagerVisualizator.$container.on("rifResize", function() {
+                var $fittingWrap = $("#"+(pageManagerVisualizator._options.nameIFrame)).closest(".pmv-fitting-wrap");
+                curSizeIFrame = {
+                    w: $fittingWrap.width(),
+                    h: $fittingWrap.height()
+                };
+            });
+            pageManagerVisualizator.$container.on("rifStopResize", function() {
+                if(resizeIFrame__timeoutId !== null) {
+                    clearInterval(resizeIFrame__timeoutId);
+                    resizeIFrame__timeoutId = null;
+                    curSizeIFrame = null;
+                    lastSizeIFrame = null;
+                }
+                sendResizeIFrame();
+            });
+
+            //Запись и отправка данных сессии
+            function sendScrollIFrame() {
+                var iframe = window[pageManagerVisualizator._options.nameIFrame];
+                var wWindow, wDocument, leftScroll, l_factor, hWindow, hDocument, topScroll, t_factor;
+
+                wWindow = $(iframe.window).width();
+                wDocument = $(iframe.document).width();
+                hWindow = $(iframe.window).height();
+                hDocument = $(iframe.document).height();
+                topScroll = $(iframe.window).scrollTop();
+                leftScroll = $(iframe.window).scrollLeft();
+
+                if(wDocument - wWindow == 0){l_factor = 0} else {l_factor = leftScroll / (wDocument - wWindow)}
+                if(hDocument - hWindow == 0){t_factor = 0} else {t_factor = topScroll / (hDocument - hWindow)}
+
+                session.onScrollIFrame({
+                    left: l_factor,
+                    top: t_factor
+                });
+            }
+            function sendChangePosIFrame() {
+                var $iframe = $("#" + (pageManagerVisualizator._options.nameIFrame));
+                var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
+                var $outerWrap = $iframe.closest(".pmv-outer-wrap");
+                var w, h, w_c, h_c, l, t, l_factor, t_factor;
+
+                w = $fittingWrap.width();
+                h = $fittingWrap.height();
+                t =   $fittingWrap.position().top;
+                l =   $fittingWrap.position().left;
+                w_c = $outerWrap.width();
+                h_c = $outerWrap.height();
+
+                if(w_c - w == 0){l_factor = 0} else {l_factor = l / (w_c - w)}
+                if(h_c - h == 0){t_factor = 0} else {t_factor = t / (h_c - h)}
+
+                session.onChangePosIFrame({
+                    left: l_factor,
+                    top: t_factor
+                });
+            }
+            function sendResizeIFrame() {
+                var $fittingWrap = $("#"+(pageManagerVisualizator._options.nameIFrame)).closest(".pmv-fitting-wrap");
+                lastSizeIFrame = {
+                    w: $fittingWrap.width(),
+                    h: $fittingWrap.height()
+                };
+                session.onResizeIFrame(lastSizeIFrame);
+            }
+
+            //Приём данных сессии
+            session.responseHandlers["onResizeIFrame"] = function(o) {
+                var ls = session.getLocalSessionParams(true);
+                if( ls && "iframe" in ls && "size" in ls.iframe ) {
+                    pageManagerVisualizator.setSizeIFrame(ls.iframe.size.w, ls.iframe.size.h, true);
+                }
+            }
+            session.responseHandlers["onChangePosIFrame"] = function(o) {
+                var ls = session.getLocalSessionParams(true);
+                if( ls && "iframe" in ls && "position" in ls.iframe ) {
+                    pageManagerVisualizator.setPositionIFrame(ls.iframe.position.left, ls.iframe.position.top);
+                }
+            }
+            session.responseHandlers["onScrollIFrame"] = function(o) {
+                var ls = session.getLocalSessionParams(true);
+                if( ls && "iframe" in ls && "scroll" in ls.iframe ) {
+                    pageManagerVisualizator.setScrollIFrame(ls.iframe.scroll.left, ls.iframe.scroll.top);
+                }
+            }
+
             //При загрузке iFrame скрываем всё окно шаблонизатора и показываем анимацию загрузки
             pageManagerVisualizator.$container.on({
                 "pmv.prepaste.iframe": function() {
@@ -737,9 +1157,14 @@ jQuery(function($) {
                 pixelPerfect._create();
 
                 var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
-                if(screenshotsCollection !== null) {
-                    pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+
+                var ls = session.getLocalSessionParams(false);
+                if(ls && "resolutions" in ls && "showPageProofsOrDesign" in ls.resolutions) {
+                    pixelPerfect.showPageProofsOrDesign(ls.resolutions.showPageProofsOrDesign);
                 }
+
+                refreshMenuViewScreenshotsForResolutions();
             });
 
             //Скроллбар для списка скриншотов привязанных к разрешениям и страницам
@@ -779,85 +1204,6 @@ jQuery(function($) {
                 }
             });
 
-            //Добавляем разрешение
-            $('#pp__modal-add-resolution .btn-select').on('click', function(event){
-                var hasError = false;
-                var w = $.trim($('#pp__modal-add-resolution .pp__modal-add-resolution-w').val());
-                var h = $.trim($('#pp__modal-add-resolution .pp__modal-add-resolution-h').val());
-
-                //Проверяем на ошибки
-                if(!(/^[1-9]\w{2,4}$/gim.test(w) && parseInt(w) >= 320 && parseInt(w) <= 99999)) {
-                    hasError = true;
-                    $('#pp__modal-add-resolution .pp__modal-add-resolution-w-group').addClass("has-error");
-                    $('#pp__modal-add-resolution .pp__modal-val-not-digit').css({display: "block"});
-                }
-                if(!(h == "auto" || (/^[1-9]\w{2,4}$/gim.test(h) && parseInt(h) >= 320 && parseInt(h) <= 99999))) {
-                    hasError = true;
-                    $('#pp__modal-add-resolution .pp__modal-add-resolution-h-group').addClass("has-error");
-                    $('#pp__modal-add-resolution .pp__modal-val-not-digit').css({display: "block"});
-                }
-                if(!hasError) {
-                    for(var i in session.data.globalSession.resolutions) {
-                        var one = session.data.globalSession.resolutions[i];
-                        if(parseInt(w) === one.w && (h === "auto" || parseInt(h) === one.h)) {
-                            hasError = true;
-                            $('#pp__modal-add-resolution .pp__modal-add-resolution-w-group').addClass("has-error");
-                            $('#pp__modal-add-resolution .pp__modal-add-resolution-h-group').addClass("has-error");
-                            $('#pp__modal-add-resolution .pp__modal-val-exists').css({display: "block"});
-                            break;
-                        }
-                    }
-                }
-
-                //Добавляем страницу
-                if(!hasError) {
-                    var html =
-                    "<li class='pp__resolutions-list-resolution' data-w='"+w+"' data-h='"+h+"'>" +
-                        '<div class="pp__resolutions-list-resolution-content">' +
-                            '<button class="btn btn-default btn-xs btn-block pp__resolutionforscreen-name-btn">' +
-                            '<span class="pp__resolutionforscreen-name-btn-w">'+w+'</span> | <span class="pp__resolutionforscreen-name-btn-h">'+h+'</span>' +
-                            '</button>' +
-                            '<button class="btn btn-default btn-xs pp__resolutions-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
-                            '<div class="btn btn-default btn-xs pp__resolutions-drag-btn"><span class="glyphicon glyphicon-move"></span></div>' +
-                        '</div>' +
-                        '<ul class="pp__resolutions-list-screenshots"></ul>' +
-                    '</li>';
-
-                    $(".pp__resolutions-screenshots-list").prepend(html);
-
-                    $('#pp__modal-add-resolution .modal').modal('hide');
-                }
-            });
-            $('.pp__add-resolution-btn').on('click', function(){
-                $('#pp__modal-add-resolution .pp__modal-val-exists').css({display: ""});
-                $('#pp__modal-add-resolution .pp__modal-val-not-digit').css({display: ""});
-                $('#pp__modal-add-resolution .pp__modal-add-resolution-w-group').removeClass("has-error");
-                $('#pp__modal-add-resolution .pp__modal-add-resolution-h-group').removeClass("has-error");
-                
-                $('#pp__modal-add-resolution .modal').modal('show');
-            });
-
-            //Удаляем разрешение
-            $('.pp__screenshots-menu').on('click', " .pp__resolutions-delete-btn", function(){
-                var w = $(this).closest(".pp__resolutions-list-resolution").attr("data-w");
-                var h = $(this).closest(".pp__resolutions-list-resolution").attr("data-h");
-                $('#pp__modal-delete-resolution .pp__modal-delete-resolution-w')
-                    .attr("data-w", w)
-                    .text(w);
-                $('#pp__modal-delete-resolution .pp__modal-delete-resolution-h')
-                    .attr("data-h", h)
-                    .text(h);
-                $('#pp__modal-delete-resolution .modal').modal('show');
-            });
-            $('#pp__modal-delete-resolution .btn-select').on('click', function(){
-                var w = $('#pp__modal-delete-resolution .pp__modal-delete-resolution-w').attr("data-w");
-                var h = $('#pp__modal-delete-resolution .pp__modal-delete-resolution-h').attr("data-h");
-
-                $('.pp__screenshots-menu .pp__resolutions-list-resolution[data-w="'+w+'"][data-h="'+h+'"]').remove();
-
-                $('#pp__modal-delete-resolution .modal').modal('hide');
-            });
-
             //Привязываем скриншот
             $('.pp__screenshots-files-menu-scrollwrap').on('click', " .pp__screenshots-btn-add-screenshot", function(){
                 if($(".pp__screenshots-menu-scrollwrap .pp__resolutions-list-resolution").length) {
@@ -883,15 +1229,9 @@ jQuery(function($) {
 
                     $(".pp__screenshots-menu-scrollwrap .pp__resolutions-list-screenshots")
                         .first()
-                        .prepend($(html).data("deviation", {
-                            pos: "static",
-                            l: "center",
-                            t: "top",
-                            lpx: 0,
-                            lper: 0,
-                            tpx: 0,
-                            tper: 0
-                        }));
+                        .prepend($(html));
+
+                    sendBindScreenshot();
                 }
             });
 
@@ -899,12 +1239,29 @@ jQuery(function($) {
             $('.pp__screenshots-menu').on('click', " .pp__resolutions-screenshots-delete-btn", function(e){
                 e.stopPropagation();
                 $(this).closest(".pp__resolutions-list-screenshot").remove();
+
+                sendUnbindScreenshot();
+            });
+
+            //Активируем-деактивируем скриншот
+            $('.pp__screenshots-menu').on('click', ' .pp__screenshot-name-btn', function() {
+                var $li = $(this).closest(".pp__resolutions-list-screenshot");
+
+                if(!$(this).hasClass("active")) {
+                    $(this).addClass("active");
+                    $li.addClass("active").data("screenshot").active = true;
+                } else {
+                    $(this).removeClass("active");
+                    $li.removeClass("active").data("screenshot").active = false;
+                }
+
+                sendActiveScreenshot();
             });
 
             //Показываем-скрываем окно "отклонения" для скриншота
             $('.pp__screenshots-menu').on('click', " .pp__resolutions-screenshots-btn-deviation", function(e){
-                var _ = $(this).closest(".pp__resolutions-list-screenshot").data("deviation");
-                $(".pp__deviation").data("deviation", _);
+                var _ = $(this).closest(".pp__resolutions-list-screenshot").data("screenshot");
+                $(".pp__deviation").data("screenshot", _);
                 setParamDeviation($(".pp__deviation"), _.pos, _.l, _.t, _.lpx, _.lper, _.tpx, _.tper);
 
                 $('.pp__deviation').addClass("open");
@@ -915,37 +1272,278 @@ jQuery(function($) {
                 }
             });
 
-            //Формируем список разрешений с списком привязанных скриншотов
-            refreshMenuView();
-            function refreshMenuView() {
-                var localSession = session.getLocalSessionParams();
-                //dragItemList = false;
-                var $main = $(".pp__resolutions-list");
-                $main.empty();
+            //Смена "Static" и "Fixed" в "окне отклонения"
+            $('.pp__screenshots-menu-window').on("click", " .pp__deviation-fixed-or-static label", function(){
+                if($(".pp__deviation").data("screenshot") !== undefined) {
+                    var pos = ($(this).find(" input").val() == 1)?"static":"fixed";
+                    var b = $(".pp__deviation").data("screenshot");
 
-                if(localSession && "pages" in localSession && localSession.pages.currentPage !== null) {
-                    var res = (function recursion(resolutions, html) {
-                        for(var i in resolutions) {
-                            var one = resolutions[i];
-                            var w = one.w;
-                            var h = one.h;
-                            var active = (localSession && "resolutions" in localSession && localSession.resolutions.currentResolution.w === w && localSession.resolutions.currentResolution.h === h)?"active":"";
-                            html += "<li class='pp__resolutions-list-item' data-w='"+w+"' data-h='"+h+"'>";
-                            html += '<div class="pp__resolutions-list-item-content">' +
-                                '<button class="btn btn-default btn-xs btn-block pp__resolution-name-btn '+active+'">' +
-                                    '<span class="pp__resolution-name-btn-w">'+w+'</span> | <span class="pp__resolution-name-btn-h">'+h+'</span>' +
-                                '</button>' +
-                                '</div>';
+                    b.pos = pos;
 
-                            html += "</li>";
-                        }
+                    if(b.pos == "static") {
+                        b.t = "top";
+                    }
 
-                        return html;
-                    })(session.data.globalSession.resolutions, "");
+                    setParamDeviation__relative($(".pp__deviation"), b.pos, b.l, b.t);
 
-                    $main.append(res);
+                    sendChangeSOrFScreenshotDeviation();
+                }
+            });
+
+            //Смена положения в сетке в "окне отклонения"
+            $('.pp__screenshots-menu-window').on("click", " .pp__deviation-relative .btn[data-left][data-top]", function(){
+                if($(".pp__deviation").data("screenshot") !== undefined) {
+                    var b = $(".pp__deviation").data("screenshot");
+                    if(!(b.pos == "static" && $(this).attr("data-top") != "top")) {
+                        b.l = $(this).attr("data-left");
+                        b.t = $(this).attr("data-top");
+
+                        setParamDeviation__relative($(".pp__deviation"), b.pos, b.l, b.t);
+
+                        sendChangeGridScreenshotDeviation();
+                    }
+                }
+            });
+
+            //Изменение значений отклонения в окне "отклонения"
+            function startDeviationSpinner(e, ui) {
+                sendStartSpinnerScreenshotDeviation(e, ui);
+            }
+            function spinDeviationSpinner(e, ui) {
+                sendSpinSpinnerScreenshotDeviation(e, ui);
+            }
+            function stopDeviationSpinner(e, ui) {
+                sendStopSpinnerScreenshotDeviation(e, ui);
+            }
+
+            //коллапсировать-рассколапсировать
+            $(".pp__screenshots-files-menu-scrollwrap").on("click", " .pp__screenshots-btn-collapsed", function(){
+                var $item = $(this).closest(".pp__screenshots-item");
+                if( $item.hasClass("collapsed") ) {
+                    $item.removeClass("collapsed")
+                        .find(" > ul").css({display: "block"});
+                } else {
+                    $item.addClass("collapsed")
+                        .find(" > ul").css({display: "none"});
+                }
+
+                sendCollapseUncollapseScreenshotsFolder();
+            });
+
+            //Показать верстку или скрины или 50 на 50
+            $('.pp__verstka-btn').on('click', function(){
+                pixelPerfect.showPageProofsOrDesign(0);
+                refreshButtonsPageProofsOrDesign(0);
+                sendHTMLOrDesign(0);
+            });
+            $('.pp__50p-btn').on('click', function(){
+                pixelPerfect.showPageProofsOrDesign(1);
+                refreshButtonsPageProofsOrDesign(1);
+                sendHTMLOrDesign(1);
+            });
+            $('.pp__design-btn').on('click', function(){
+                pixelPerfect.showPageProofsOrDesign(2);
+                refreshButtonsPageProofsOrDesign(2);
+                sendHTMLOrDesign(2);
+            });
+
+            //Горячие клавишы
+            $('body').on('keydown', handlerFastChangePageProofsOrDesign);
+            pageManagerVisualizator.$container.on( "pmv.load.iframe", function(){
+                $('#'+(pageManagerVisualizator._options.nameIFrame)).contents().find("body").on('keydown', handlerFastChangePageProofsOrDesign);
+            });
+            function handlerFastChangePageProofsOrDesign(e) {
+                if(e.which == 81 && e.ctrlKey && !e.shiftKey && !e.altKey)//(e.which == 65 || e.which == 83 || e.which == 68)
+                {
+                    if($('.pp__50p-btn, .pp__design-btn').hasClass('active'))
+                    {
+                        pixelPerfect.showPageProofsOrDesign(0);
+                        sendHTMLOrDesign(0);
+                    }
+                    else
+                    {
+                        pixelPerfect.showPageProofsOrDesign(1);
+                        sendHTMLOrDesign(1);
+                    }
+
+                    e = e || window.e; if (e.stopPropagation) {e.stopPropagation()} else {e.cancelBubble = true} e.preventDefault();
                 }
             }
+
+            crossModulesFunctions["pp.refreshButtonsPageProofsOrDesign"] = function(show) {
+                $('.pp__verstka-design .btn').removeClass("active btn-primary btn-success btn-info btn-warning btn-danger").addClass("btn-default");
+                switch (show) {
+                    case 0:
+                        $('.pp__verstka-btn').removeClass("btn-default").addClass("active btn-primary");
+                        break;
+                    case 1:
+                        $('.pp__50p-btn').removeClass("btn-default").addClass("active btn-warning");
+                        break;
+                    case 2:
+                        $('.pp__design-btn').removeClass("btn-default").addClass("active btn-danger");
+                        break;
+                }
+            }
+            function refreshButtonsPageProofsOrDesign(show) {
+                crossModulesFunctions["pp.refreshButtonsPageProofsOrDesign"](show);
+            }
+
+            //Запись и отправка данных сессии
+            var screenshotsCollectionTemp;
+            var screenshotsObjListTemp;
+            var allScreenshotsForCurPageToJsonTemp;
+
+            function sendBindScreenshot() {
+                session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendUnbindScreenshot() {
+                session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendSortableScreenshot() {
+                session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendActiveScreenshot() {
+                session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendChangeSOrFScreenshotDeviation() {
+                session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendChangeGridScreenshotDeviation() {
+                session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            function sendStartSpinnerScreenshotDeviation(e, ui) {
+                if($(".pp__deviation").data("screenshot") !== undefined) {
+                    var b = $(".pp__deviation").data("screenshot");
+
+                    if($(e.currentTarget).hasClass("pp__deviation-left-px")){b.lpx = parseInt($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-left-percent")){b.lper = parseFloat($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-top-px")){b.tpx = parseInt($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-top-percent")){b.tper = parseFloat($(e.currentTarget).val())}
+
+                    allScreenshotsForCurPageToJsonTemp = allScreenshotsForCurPageToJson();
+                    session.onChangeScreenshots(allScreenshotsForCurPageToJsonTemp);
+                    screenshotsCollectionTemp = session.getCurrentRelatedScreenshotsCollection();
+                    screenshotsObjListTemp = session.getScreenshotsObjList();
+                    pixelPerfect.refreshScrins(screenshotsCollectionTemp, screenshotsObjListTemp);
+                }
+            }
+            function sendSpinSpinnerScreenshotDeviation(e, ui) {
+                if($(".pp__deviation").data("screenshot") !== undefined) {
+                    var b = $(".pp__deviation").data("screenshot");
+
+                    if($(e.currentTarget).hasClass("pp__deviation-left-px")){b.lpx = parseInt($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-left-percent")){b.lper = parseFloat($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-top-px")){b.tpx = parseInt($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-top-percent")){b.tper = parseFloat($(e.currentTarget).val())}
+
+                    session.onFastChangeScreenshots(allScreenshotsForCurPageToJsonTemp);//Fast
+                    pixelPerfect.refreshScrins(screenshotsCollectionTemp, screenshotsObjListTemp);
+                }
+            }
+            function sendStopSpinnerScreenshotDeviation(e, ui) {
+                if($(".pp__deviation").data("screenshot") !== undefined) {
+                    var b = $(".pp__deviation").data("screenshot");
+
+                    if($(e.currentTarget).hasClass("pp__deviation-left-px")){b.lpx = parseInt($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-left-percent")){b.lper = parseFloat($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-top-px")){b.tpx = parseInt($(e.currentTarget).val())}
+                    else if($(e.currentTarget).hasClass("pp__deviation-top-percent")){b.tper = parseFloat($(e.currentTarget).val())}
+
+                    session.onChangeScreenshots(allScreenshotsForCurPageToJson());
+
+                    var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                    pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+                }
+            }
+
+            function sendCollapseUncollapseScreenshotsFolder() {
+                session.onCollapseUncollapseScreenshotsFolder(collapseUncollapseScreenshotsFolderToJson($(".pp__screenshots-files-menu-scrollwrap")));
+            }
+
+            function sendHTMLOrDesign(state) {
+                session.onHTMLOrDesign(state);
+            }
+
+            //Приём данных сессии
+            session.responseHandlers["onChangeScreenshots"] = function() {
+                refreshMenuViewScreenshotsForResolutions();
+
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            session.responseHandlers["onFastChangeScreenshots"] = function() {
+                //console.time("dd");
+                var screenshotsCollection = session.getCurrentRelatedScreenshotsCollection();
+                //console.timeEnd("dd");
+                pixelPerfect.refreshScrins(screenshotsCollection, session.getScreenshotsObjList());
+            }
+            session.responseHandlers["onCollapseUncollapseScreenshotsFolder"] = function() {
+                refreshMenuAllScreenshots();
+            }
+            session.responseHandlers["onHTMLOrDesign"] = function() {
+                var ls = session.getLocalSessionParams(true);
+                if(ls && "resolutions" in ls && "showPageProofsOrDesign" in ls.resolutions) {
+                    pixelPerfect.showPageProofsOrDesign(ls.resolutions.showPageProofsOrDesign);
+                    crossModulesFunctions["pp.refreshButtonsPageProofsOrDesign"](ls.resolutions.showPageProofsOrDesign);
+                }
+            }
+
+            //Все скриншоты для текущей страницы в json
+            crossModulesFunctions["pp.allScreenshotsForCurPageToJson"] = function () {
+                return allScreenshotsForCurPageToJson();
+            }
+            function allScreenshotsForCurPageToJson() {
+                var newScreenshotsForCurPage = {};
+
+                $(".pp__screenshots-menu-window .pp__resolutions-list-screenshot").each(function() {
+                    var $liResolution = $(this).closest(".pp__resolutions-list-resolution");
+                    var w = $liResolution.attr("data-w");
+                    var h = $liResolution.attr("data-h");
+                    var w_h = w+"|"+h;
+
+                    if(!(w_h in newScreenshotsForCurPage)) {
+                        newScreenshotsForCurPage[w_h] = [];
+                    }
+
+                    var newScrinshot;
+                    if($(this).data("screenshot") === undefined) {
+                        newScrinshot = {
+                            urn: $(this).attr("data-urn"),
+                            active: false,
+                            pos: "static",
+                            l: "center",
+                            t: "top",
+                            lpx: 0,
+                            tpx: 0,
+                            lper: 0,
+                            tper: 0
+                        };
+                        $(this).data("screenshot", newScrinshot);
+                    }
+                    newScreenshotsForCurPage[w_h].push($(this).data("screenshot"));
+                });
+
+                return newScreenshotsForCurPage;
+            }
+            //Формируем список разрешений с списком привязанных скриншотов
 
             $(".pp__screenshots-menu").prepend("<ul class='pp__resolutions-screenshots-list'></ul>");
             refreshMenuViewScreenshotsForResolutions();
@@ -966,14 +1564,15 @@ jQuery(function($) {
                         return;
                     }
                 },*/
-                stop: function(){
-                    //$container.trigger("sm.change");
-                }
+                update: crossModulesFunctions["pmv.sendSortableResolutions"]
             });
-            var globalScreenshotsRelatedData;
+            var allScreenshotsForCurPageTemp;
+            crossModulesFunctions["pmv.refreshMenuViewScreenshotsForResolutions"] = function() {
+                refreshMenuViewScreenshotsForResolutions();
+            }
             function refreshMenuViewScreenshotsForResolutions() {
                 var localSession = session.getLocalSessionParams();
-                globalScreenshotsRelatedData = [];
+                allScreenshotsForCurPageTemp = [];
                 //dragItemList = false;
                 var $main = $(".pp__resolutions-screenshots-list");
                 $main.empty();
@@ -988,7 +1587,7 @@ jQuery(function($) {
                             html += "<li class='pp__resolutions-list-resolution' data-w='"+w+"' data-h='"+h+"'>";
                             html += '<div class="pp__resolutions-list-resolution-content">' +
                                 '<button class="btn btn-default btn-xs btn-block pp__resolutionforscreen-name-btn '+active+'">' +
-                                    '<span class="pp__resolutionforscreen-name-btn-w">'+w+'</span> | <span class="pp__resolutionforscreen-name-btn-h">'+h+'</span>' +
+                                '<span class="pp__resolutionforscreen-name-btn-w">'+w+'</span> | <span class="pp__resolutionforscreen-name-btn-h">'+h+'</span>' +
                                 '</button>' +
                                 '<button class="btn btn-default btn-xs pp__resolutions-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
                                 '<div class="btn btn-default btn-xs pp__resolutions-drag-btn"><span class="glyphicon glyphicon-move"></span></div>' +
@@ -1007,12 +1606,13 @@ jQuery(function($) {
 
                     var i = 0;
                     $main.find(" .pp__resolutions-list-screenshot").each(function() {
-                        $(this).data("deviation", globalScreenshotsRelatedData[i]);
+                        $(this).data("screenshot", allScreenshotsForCurPageTemp[i]);
                         i++;
                     });
                 }
                 refreshSortableScreensotsInResolutions();
             }
+
             createDeviation();
             function createDeviation() {
                 var html = '' +
@@ -1091,112 +1691,103 @@ jQuery(function($) {
                 refreshSpinner($(".pp__deviation"));
             }
             function setParamDeviation($container, pos, l, t, lpx, lper, tpx, tper) {
-                var $static = $container.find(" .pp__deviation-fixed-or-static label").first();
-                var $fixed = $container.find(" .pp__deviation-fixed-or-static label").last();
-                if(pos == "static") {
-                    $static.removeClass("btn-default").addClass("btn-primary active");
-                    $static.find(" input").prop("checked", true);
-                    $fixed.addClass("btn-default").removeClass("btn-danger active");
-                    $fixed.find(" input").prop("checked", false);
-                } else {
-                    $static.addClass("btn-default").removeClass("btn-primary active");
-                    $static.find(" input").prop("checked", false);
-                    $fixed.removeClass("btn-default").addClass("btn-danger active");
-                    $fixed.find(" input").prop("checked", true);
-                }
-
-                var $relative = $container.find(" .pp__deviation-relative");
-                if(pos == "static") {
-                    $relative.addClass("pp__deviation-static").removeClass("pp__deviation-fixed");
-                    $relative.find(" .btn[data-top!='top']").addClass("disabled");
-                } else {
-                    $relative.removeClass("pp__deviation-static").addClass("pp__deviation-fixed");
-                    $relative.find(" .btn[data-top!='top']").removeClass("disabled");
-                }
-                $relative.find(" .btn").removeClass("active btn-danger").addClass("btn-default");
-                $relative.find(" .btn[data-left='"+l+"'][data-top='"+t+"']").addClass("active btn-danger").removeClass("btn-default");
-
-                var deviationInput = $container.find(" .pp__deviation-input");
-                deviationInput.filter(".pp__deviation-left-px").val(lpx);
-                deviationInput.filter(".pp__deviation-left-percent").val(lper);
-                deviationInput.filter(".pp__deviation-top-px").val(tpx);
-                deviationInput.filter(".pp__deviation-top-percent").val(tper);
+                setParamDeviation__relative($container, pos, l, t);
+                setParamDeviation__deviation($container, lpx, lper, tpx, tper);
             }
+                //Радио кнопки "Static" и "Fixed" и положени в сетке
+                function setParamDeviation__relative($container, pos, l, t) {
+                    var $static = $container.find(" .pp__deviation-fixed-or-static label").first();
+                    var $fixed = $container.find(" .pp__deviation-fixed-or-static label").last();
+                    if(pos == "static") {
+                        $static.removeClass("btn-default").addClass("btn-primary active");
+                        $static.find(" input").prop("checked", true);
+                        $fixed.addClass("btn-default").removeClass("btn-danger active");
+                        $fixed.find(" input").prop("checked", false);
+                    } else {
+                        $static.addClass("btn-default").removeClass("btn-primary active");
+                        $static.find(" input").prop("checked", false);
+                        $fixed.removeClass("btn-default").addClass("btn-danger active");
+                        $fixed.find(" input").prop("checked", true);
+                    }
+
+                    if(pos == "static") {
+                        t = "top";
+                    }
+                    var $relative = $container.find(" .pp__deviation-relative");
+                    if(pos == "static") {
+                        $relative.addClass("pp__deviation-static").removeClass("pp__deviation-fixed");
+                        $relative.find(" .btn[data-top!='top']").addClass("disabled");
+                    } else {
+                        $relative.removeClass("pp__deviation-static").addClass("pp__deviation-fixed");
+                        $relative.find(" .btn[data-top!='top']").removeClass("disabled");
+                    }
+                    $relative.find(" .btn").removeClass("active btn-danger").addClass("btn-default");
+                    $relative.find(" .btn[data-left='"+l+"'][data-top='"+t+"']").addClass("active btn-danger").removeClass("btn-default");
+                }
+                //Отклонение заданное в пикселях и процентах
+                function setParamDeviation__deviation($container, lpx, lper, tpx, tper) {
+                    var deviationInput = $container.find(" .pp__deviation-input");
+                    deviationInput.filter(".pp__deviation-left-px").val(lpx);
+                    deviationInput.filter(".pp__deviation-left-percent").val(lper);
+                    deviationInput.filter(".pp__deviation-top-px").val(tpx);
+                    deviationInput.filter(".pp__deviation-top-percent").val(tper);
+                }
             //Обновить спиннер
             function refreshSpinner($container) {
                 $container.find(" .pp__deviation-left-px").add($container.find(" .pp__deviation-top-px")).spinner({
                     min: -99999,
                     max: 99999,
-                    start: function(){
-
-                    },
-                    spin: function(){
-
-                    },
-                    stop: function(){
-
-                    }
+                    start: startDeviationSpinner,
+                    spin: spinDeviationSpinner,
+                    stop: stopDeviationSpinner
                 });
                 $container.find(" .pp__deviation-left-percent").add($container.find(" .pp__deviation-top-percent")).spinner({
                     min: -9999,
                     max: 9999,
                     step: 0.1,
-                    start: function(){
-
-                    },
-                    spin: function(){
-
-                    },
-                    stop: function(){
-
-                    }
+                    start: startDeviationSpinner,
+                    spin: spinDeviationSpinner,
+                    stop: stopDeviationSpinner
                 });
             }
-                //Вывод привязанных скриншотов
-                function createScreenshotsList(currentPage, resolution, screenshotsRelated) {
-                    if(currentPage in screenshotsRelated && (resolution.w+"|"+resolution.h) in  screenshotsRelated[currentPage]) {
-                        //nestet to object list
-                        var screenshotsObjList = session.getScreenshotsObjList();
 
-                        var screenshots = screenshotsRelated[currentPage][resolution.w+"|"+resolution.h];
-                        var html = "";
-                        for(var key in screenshots) {
-                            var s =  screenshots[key];//screenshot
+            //Вывод привязанных скриншотов
+            function createScreenshotsList(currentPage, resolution, screenshotsRelated) {
+                if(currentPage in screenshotsRelated && (resolution.w+"|"+resolution.h) in  screenshotsRelated[currentPage]) {
+                    //nestet to object list
+                    var screenshotsObjList = session.getScreenshotsObjList();
 
-                            if(s.pos == "static") {
-                                s.t = "top";
-                            }
-                            globalScreenshotsRelatedData.push({
-                                pos: s.pos,
-                                l: s.l,
-                                t: s.t,
-                                lpx: s.lpx,
-                                lper: s.lper,
-                                tpx: s.tpx,
-                                tper: s.tper
-                            });
-                            //html += (s.urn, s.active, screenshotsObjList[s.urn].w, screenshotsObjList[s.urn].h, s.pos, s.l, s.t, s.lpx, s.lper, s.tpx, s.tper);++++++++++++++++++
-                            html += '' +
-                            '<li class="pp__resolutions-list-screenshot" data-urn="'+s.urn+'" data-w="'+screenshotsObjList[s.urn].w+'" data-h="'+screenshotsObjList[s.urn].h+'">' +
-                                '<div class="pp__screenshot-content">' +
-                                    '<button class="btn btn-default btn-xs btn-block pp__screenshot-name-btn '+((s.active)?"active":"")+'">' +
-                                        '<div class="btn btn-default btn-xs pp__resolutions-screenshots-btn-size" data-w="'+screenshotsObjList[s.urn].w+'" data-h="'+screenshotsObjList[s.urn].h+'">' +
-                                            '<span class="pp__screenshot-name-btn-w">'+screenshotsObjList[s.urn].w+'</span> | <span class="pp__screenshot-name-btn-h">'+screenshotsObjList[s.urn].h+'</span>' +
-                                        '</div>' +
-                                        s.urn +
-                                    '</button>' +
-                                    '<button class="btn btn-default btn-xs pp__resolutions-screenshots-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
-                                    '<div class="btn btn-default btn-xs pp__resolutions-screenshots-drag-btn"><span class="glyphicon glyphicon-move"></span></div>' +
-                                    '<button class="pp__resolutions-screenshots-btn-deviation btn btn-default btn-xs"><i class="glyphicon glyphicon-option-vertical" aria-hidden="true"></i></button>' +
-                                '</div>' +
-                            '</li>';
+                    var screenshots = screenshotsRelated[currentPage][resolution.w+"|"+resolution.h];
+                    var html = "";
+                    for(var key in screenshots) {
+                        var s =  screenshots[key];//screenshot
+
+                        if(s.pos == "static") {
+                            s.t = "top";
                         }
-                        return html;
+                        allScreenshotsForCurPageTemp.push(s);
+
+                        html += '' +
+                        '<li class="pp__resolutions-list-screenshot '+((s.active)?"active":"")+'" data-urn="'+s.urn+'" data-w="'+screenshotsObjList[s.urn].w+'" data-h="'+screenshotsObjList[s.urn].h+'">' +
+                            '<div class="pp__screenshot-content">' +
+                                '<button class="btn btn-default btn-xs btn-block pp__screenshot-name-btn '+((s.active)?"active":"")+'">' +
+                                    '<div class="btn btn-default btn-xs pp__resolutions-screenshots-btn-size" data-w="'+screenshotsObjList[s.urn].w+'" data-h="'+screenshotsObjList[s.urn].h+'">' +
+                                        '<span class="pp__screenshot-name-btn-w">'+screenshotsObjList[s.urn].w+'</span> | <span class="pp__screenshot-name-btn-h">'+screenshotsObjList[s.urn].h+'</span>' +
+                                    '</div>' +
+                                    s.urn +
+                                '</button>' +
+                                '<button class="btn btn-default btn-xs pp__resolutions-screenshots-delete-btn"><span class="glyphicon glyphicon-remove"></span></button>' +
+                                '<div class="btn btn-default btn-xs pp__resolutions-screenshots-drag-btn"><span class="glyphicon glyphicon-move"></span></div>' +
+                                '<button class="pp__resolutions-screenshots-btn-deviation btn btn-default btn-xs"><i class="glyphicon glyphicon-option-vertical" aria-hidden="true"></i></button>' +
+                            '</div>' +
+                        '</li>';
                     }
-                    return "";
+                    return html;
                 }
-                //Просто обновляем сортировку
-                function refreshSortableScreensotsInResolutions() {
+                return "";
+            }
+            //Просто обновляем сортировку
+            function refreshSortableScreensotsInResolutions() {
                     $(".pp__resolutions-list-screenshots").sortable({
                         revert: true,
                         cursor: 'move',
@@ -1222,7 +1813,8 @@ jQuery(function($) {
                         },
                         stop: function(){
                             //$container.trigger("sm.change");
-                        }
+                        },
+                        update: sendSortableScreenshot
                     });
                 }
 
@@ -1294,17 +1886,16 @@ jQuery(function($) {
                     $main.find(" .pp__screenshots-item.collapsed > ul").css({display: "none"});
                     $main.find(" .pp__screenshots-item > ul").not($main.find(" .pp__screenshots-item.collapsed > ul")).css({display: "block"});
                 }
-                //коллапсировать-рассколапсировать
-                $(".pp__screenshots-files-list").on("click", " .pp__screenshots-btn-collapsed", function(){
-                    var $item = $(this).closest(".pp__screenshots-item");
-                    if( $item.hasClass("collapsed") ) {
-                        $item.removeClass("collapsed")
-                            .find(" > ul").css({display: "block"});
-                    } else {
-                        $item.addClass("collapsed")
-                            .find(" > ul").css({display: "none"});
-                    }
-                });
+                function collapseUncollapseScreenshotsFolderToJson($main) {
+                    return $main.find(" .pp__screenshots-item")
+                        .map(function() {
+                            return ($(this).hasClass("have-nested") && (!$(this).hasClass("collapsed"))) ? $(this).attr("data-urn") : null;
+                        })
+                        .get()
+                        .filter(function(el) {
+                            return el !== false;
+                        });
+                }
 
             //Отображаем миниатюрку
             var windowThumbnail__timeoutId = null;
@@ -1330,71 +1921,25 @@ jQuery(function($) {
                     }, 10);
                 }
             });
-
-            //Сменяем разрешение
-            $('.shab__top-menu').on('change', ' .select-group', function() {
-                var $optionSelected = $('.shab__top-menu .select-group option:selected');
-                pixelPerfect.selectSize( $optionSelected.attr('data-width'), $optionSelected.attr('data-height') );
-            });
-
-            //Показать верстку или скрины или 50 на 50
-            $('.pp__verstka-btn').on('click', function(){
-                pixelPerfect.showPageProofsOrDesign(0);
-                refreshButtonsPageProofsOrDesign();
-            });
-            $('.pp__50p-btn').on('click', function(){
-                pixelPerfect.showPageProofsOrDesign(1);
-                refreshButtonsPageProofsOrDesign();
-            });
-            $('.pp__design-btn').on('click', function(){
-                pixelPerfect.showPageProofsOrDesign(2);
-                refreshButtonsPageProofsOrDesign();
-            });
-
-            //Горячие клавишы
-            pageManagerVisualizator.$container.on( "pmv.load.iframe", function(){
-                $('body')
-                    .add( $('#'+(pageManagerVisualizator._options.nameIFrame)).contents().find("body") )
-                    .on('keydown', function(e) {
-                        if(e.which == 81 && e.ctrlKey && !e.shiftKey && !e.altKey)//(e.which == 65 || e.which == 83 || e.which == 68)
-                        {
-                            if($('.pp__50p-btn, .pp__design-btn').hasClass('active'))
-                            {
-                                pixelPerfect.showPageProofsOrDesign(0);
-                            }
-                            else
-                            {
-                                pixelPerfect.showPageProofsOrDesign(1);
-                            }
-
-                            e = e || window.e; if (e.stopPropagation) {e.stopPropagation()} else {e.cancelBubble = true} e.preventDefault();
-                        }
-                    });
-            });
-
-            //Обновить кнопки
-            function refreshButtonsPageProofsOrDesign(show) {
-                $('.pp__verstka-design .btn').removeClass("active btn-primary btn-success btn-info btn-warning btn-danger").addClass("btn-default");
-                switch (show) {
-                    case 0:
-                        $('.pp__verstka-btn').removeClass("btn-default").addClass("active btn-primary");
-                        break;
-                    case 1:
-                        $('.pp__50p-btn').removeClass("btn-default").addClass("active btn-warning");
-                        break;
-                    case 2:
-                        $('.pp__design-btn').removeClass("btn-default").addClass("active btn-danger");
-                        break;
-                }
-            }
         })();
+
+        //Первое применение сессии
+        crossModulesFunctions["session.applyAllParamsLocalSession"](false);
 
         /****************************************************/
         /*Для тестов*/
         /****************************************************/
         $(document).ready(function(){
-            $('#testovaya_ssilka').on('click', function(event){
-
+            $("body").on('keydown', function(e) {
+                if(e.which == 49 && e.altKey) {//(e.which == 65 || e.which == 83 || e.which == 68)
+                    //console.log(parseFloat("900.5"));//Возвращает целое число
+                    //console.log($("body").data("dfsdfsd"));//Возвращает undefined
+                    /*var obj = {a: 1, b: 2};
+                    $("body").data("dfsdfsd", obj);
+                    $("body").data("dfsdfsd").a = 10;
+                    console.log(obj);*///обект не клонируеться, а остаёться оригинальным
+                    console.log(navigator.userAgent);
+                }
             });
         });
 

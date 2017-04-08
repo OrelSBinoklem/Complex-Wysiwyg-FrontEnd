@@ -14,7 +14,12 @@ var defaultOptions = {
     movementOfTheCursorInAConfinedSpaceSpred: 10,
     
     gorizontalFixation: "center",
-    verticalFixation: "top"
+    verticalFixation: "top",
+
+    minHeightCalculateAuto: 480,
+    heightCalculateRatio: 16/9,
+    calculatedHeightAsMaxHeight: true,
+    stopAllAnimationsAtResize: true
 };
 
 var pageManagerVisualizator = function($container, sessionModel, options) {
@@ -42,10 +47,97 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     //Синхронизируем с фиксатором контента при ресайзе
     $container.on({
         "pmv.load.iframe": fixationContentAtResize.reload,
-        "rif.start.resize": fixationContentAtResize.startFixation,
-        "rif.stop.resize": fixationContentAtResize.stopFixation
+        "rifStartResize": fixationContentAtResize.startFixation,
+        "rifStopResize": fixationContentAtResize.stopFixation
     });
-    
+
+    this.setSizeIFrame = function( w, source_h, fast ) {
+        var $fittingWrap = $("#"+(____._options.nameIFrame)).closest(".pmv-fitting-wrap");
+
+        var h;
+
+        w = parseInt(w);
+
+        if(source_h == "auto") {
+            h = Math.round(w / ____._options.heightCalculateRatio);
+            if(h < ____._options.minHeightCalculateAuto) {
+                h = ____._options.minHeightCalculateAuto;
+            }
+        } else {
+            h = source_h;
+        }
+
+        if(fast) {
+            fixationContentAtResize.startFixation();
+
+            if(source_h == "auto" && ____._options.calculatedHeightAsMaxHeight) {
+                $fittingWrap.stop().css({width: w+'px', height: '100%', maxHeight: h+'px'});
+            } else {
+                $fittingWrap.stop().css({width: w+'px', height: h+'px', maxHeight: ''});
+            }
+
+            fixationContentAtResize.stopFixation();
+        } else {
+            fixationContentAtResize.startFixation();
+
+            if(source_h == "auto" && ____._options.calculatedHeightAsMaxHeight) {
+                var $outerWrap = $("#"+(____._options.nameIFrame)).closest(".pmv-outer-wrap");
+
+                $fittingWrap.css({height: ($fittingWrap.height())+'px', maxHeight: ''});
+                
+                $fittingWrap.stop().animate({width: w+'px', height: ((h < $outerWrap.height())?h:$outerWrap.height())+'px'}, 1000, "swing", function() {
+                    $fittingWrap.stop().css({width: w+'px', height: '100%', maxHeight: h+'px'});
+
+                    fixationContentAtResize.stopFixation();
+                });
+            } else {
+                $fittingWrap.css({maxHeight: ''});
+                $fittingWrap.stop().animate({width: w+'px', height: h+'px'}, 1000, "swing", function() {
+                    fixationContentAtResize.stopFixation();
+                });
+            }
+        }
+
+    }
+
+    this.setPositionIFrame = function(l_factor, t_factor) {
+        var $iframe = $("#" + (____._options.nameIFrame));
+        var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
+        var $outerWrap = $iframe.closest(".pmv-outer-wrap");
+        var w, h, w_c, h_c, l, t;
+
+        w = $fittingWrap.width();
+        h = $fittingWrap.height();
+        w_c = $outerWrap.width();
+        h_c = $outerWrap.height();
+
+        l = Math.round( (w_c - w) * l_factor );
+        t = Math.round( (h_c - h) * t_factor );
+
+        $fittingWrap.css({
+            top: t,
+            left: l
+        });
+
+        resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
+    }
+
+    this.setScrollIFrame = function(l_factor, t_factor) {
+        var iframe = window[____._options.nameIFrame];
+        var wWindow, wDocument, leftScroll, hWindow, hDocument, topScroll;
+
+        wWindow = $(iframe.window).width();
+        wDocument = $(iframe.document).width();
+        hWindow = $(iframe.window).height();
+        hDocument = $(iframe.document).height();
+
+        leftScroll = Math.round( (wDocument - wWindow) * l_factor );
+        topScroll = Math.round( (hDocument - hWindow) * t_factor );
+
+        $(iframe.window).scrollLeft((leftScroll < 0)?0:leftScroll);
+        $(iframe.window).scrollTop((topScroll < 0)?0:topScroll);
+    }
+
     this._create = function() {
         this._init();
         
@@ -66,23 +158,6 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
         //Получем список страниц
         ____.localSession = sessionModel.getLocalSessionParams();
         options.pageList = {};
-        ____._restoreSession("pagelist");
-        $container.on("pmv.load.iframe", function(){
-            ____._restoreSession( "size_iframe" );
-            ____._restoreSession( "scroll_iframe" );
-            ____._restoreSession( "position_iframe" );
-            
-            resizeIFrame._centerIFrameAndNoEmptySpace();//И так сработает после всех методов - потому что события выполняються позже (КРОМЕ FIREFOX)
-        });
-    }
-
-    this.handlerSelectPage = function(href) {
-        ____.currentPage = href;
-        ____._destroyIFrame();
-        if(href !== null) {
-            ____._createIFrame(href);
-        }
-        $container.trigger("pmv.user.changepage");
     }
     
     this.selectPage = function(href) {
@@ -108,50 +183,6 @@ var pageManagerVisualizator = function($container, sessionModel, options) {
     
     this._destroyIFrame = function() {
         $( '#'+(____._options.nameIFrame) ).remove();
-    }
-    
-    this._restoreSession = function( specific ) {
-        switch( specific ) {
-            //Загрузка активной страницы 
-            case "pagelist":
-                if( ____.localSession && "pages" in ____.localSession ) {
-                    ____.selectPage("/" + ____.localSession.pages.currentPage);
-                } else {
-
-                }
-                break;
-            case "scroll_iframe":
-                var iframe = window[____._options.nameIFrame];
-
-                if( ____.localSession && "iframe" in ____.localSession ) {
-                    $(iframe.window).scrollTop( ____.localSession.iframe.scroll.top );
-                    $(iframe.window).scrollLeft( ____.localSession.iframe.scroll.left );
-                }
-                break;
-            case "position_iframe":
-                var $iframe = $("#"+(____._options.nameIFrame));
-                var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
-
-                if( ____.localSession && "iframe" in ____.localSession ) {
-                    //доделать чтоб учитывались проценты
-                    $fittingWrap.css({
-                        left: ____.localSession.iframe.position.top,
-                        top: ____.localSession.iframe.position.left
-                    });
-                }
-                break;
-            case "size_iframe":
-                var $iframe = $("#"+(____._options.nameIFrame));
-                var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
-
-                if( ____.localSession && "iframe" in ____.localSession ) {
-                    $fittingWrap.css({
-                        width: ____.localSession.iframe.size.w,
-                        height: ____.localSession.iframe.size.h
-                    });
-                }
-                break;
-        }
     }
     
     this._saveSession = function() {

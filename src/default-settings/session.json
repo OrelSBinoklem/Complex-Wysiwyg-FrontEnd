@@ -204,6 +204,37 @@
       }
     },
     {
+      "name": "casual",
+      "synchroParams": [
+        "pages"
+      ],
+      "data": {
+        "pages": {
+          "currentPage": "questor-it.ru/www/case-dostaevsky.html"
+        },
+        "resolutions": {
+          "currentResolution": {
+            "w": 320,
+            "h": "auto"
+          }
+        },
+        "iframe": {
+          "scroll": {
+            "top": 0,
+            "left": 0
+          },
+          "position": {
+            "top": 0,
+            "left": 0
+          },
+          "size": {
+            "w": 480,
+            "h": 320
+          }
+        }
+      }
+    },
+    {
       "name": "664пп",
       "synchroParams": [],
       "data": {}

@@ -43,8 +43,7 @@ var mapNavigatorIFrame = function($container, options) {
         ____.updateDraggable();
     }
     
-    this._destroy = function()
-    {
+    this._destroy = function() {
         ____._options.$mapNavigatorContainer.find(" .mnif-show-space").remove();
         
         var $iFrame = $("#"+(____._options.nameIFrame)).contents();
@@ -58,8 +57,7 @@ var mapNavigatorIFrame = function($container, options) {
         $iFrame.find('body').off('keyup mouseup', ____._handlerUp);
     }
     
-    this.reload = function()
-    {
+    this.reload = function() {
         ____._destroy();
         ____._create();
     }
@@ -108,8 +106,7 @@ var mapNavigatorIFrame = function($container, options) {
     }
     
     //Отпускание клавиш
-    this._handlerUp = function(e)
-    {
+    this._handlerUp = function(e) {
         if( ____._draggable ) {
             /*var $mnif = ____._options.$mapNavigatorContainer.find(" .mnif-show-space");
             $mnif.css({display: "none"});*/
@@ -118,8 +115,7 @@ var mapNavigatorIFrame = function($container, options) {
     }
     
     //Обновление карты
-    this.updateDraggable = function()
-    {
+    this.updateDraggable = function() {
         var $iframe = $("#"+(____._options.nameIFrame));
         var $fittingWrap = $iframe.closest(".pmv-fitting-wrap");
         var $outerWrap = $iframe.closest(".pmv-outer-wrap");
@@ -184,8 +180,7 @@ var mapNavigatorIFrame = function($container, options) {
     }
     
     //Обновление скрытого скролла в IFrame
-    this._handlerMove = function(e)
-    {
+    this._handlerMove = function(e) {
         ____._last_cursor_X = e.screenX;
         ____._last_cursor_Y = e.screenY;
         
@@ -252,6 +247,8 @@ var mapNavigatorIFrame = function($container, options) {
                 }
                 
                 $fittingWrap.css({top: Math.round( resTop )});
+
+                $container.trigger("mnif.changePos");
             }
             
             if(w > w_c) {
@@ -285,6 +282,8 @@ var mapNavigatorIFrame = function($container, options) {
                 }
     			
                 $fittingWrap.css({left: Math.round( resLeft )});
+
+                $container.trigger("mnif.changePos");
             }
             
             ____.updateDraggable();

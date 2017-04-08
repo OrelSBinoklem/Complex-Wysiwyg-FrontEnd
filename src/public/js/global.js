@@ -39,9 +39,6 @@ var pixelPerfect;//Пиксель перфект
 
 var shablonizator = {};//shablonizator
 
-shablonizator.base_url_page = '';
-shablonizator.base_url_page_full = '';
-
 //==============================================
 /* РАБОТА С URL*/
 //==============================================
